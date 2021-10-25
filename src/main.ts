@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import {mat4, vec3, vec4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -11,13 +11,14 @@ import ExpansionRule from './lsystem/ExpansionRule';
 import DrawingRule from './lsystem/DrawingRule';
 import Turtle from './lsystem/Turtle';
 import Mesh from './geometry/Mesh';
+import LSystem from './lsystem/LSystem';
 
 
 /* l system for 2D (should I use a geometry for the pine needles?)
 angle: 38
 axiom: FFFFFFFV
 rules:
-V=[+++W][---W]Y[+++W][---W]Y[+++W][---W]Y[+++W][---W]V
+V=[+++W][---X]Y[+++W][---X]Y[+++W][---X]Y[+++W][---X]V
 W=+X[-WW]Z
 X=-W[+XX]Z
 Y=YZ
@@ -39,94 +40,13 @@ let cylinder: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
 
-function lSystemParse() {
-  square = new Square();
-  square.create();
-  screenQuad = new ScreenQuad();
-  screenQuad.create();
-  let offsetsArray = [];
-  let colorsArray = [];
-  let n: number = 100.0;
-
-  let iterations: number = 3;
-  let axiom: string = "F";
-  let stack: Turtle[] = [];
-  let turtle: Turtle = new Turtle(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0));
-  
-  let expansionRules: Map<string, ExpansionRule> = new Map();
-  expansionRules.set('F', new ExpansionRule('F', 'F[+F][-F]'));
-
-  let drawRules: Map<string, DrawingRule> = new Map();
-  drawRules.set('F', new DrawingRule('F', square, turtle.moveUp.bind(turtle)));  
-  drawRules.set('+', new DrawingRule('+', null, turtle.rotateAboutForward.bind(turtle, 45)));  
-  drawRules.set('-', new DrawingRule('-', null, turtle.rotateAboutForward.bind(turtle, -45)));
-
-  let newAxiom: string = "";
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < axiom.length; j++) {
-      let symbol: string = axiom.charAt(j);
-      if (symbol == "[") {
-        newAxiom += symbol;
-      } else if (symbol == "]") {
-        newAxiom += symbol;
-      } else {
-        let expansion = expansionRules.get(symbol); 
-        if (expansion != null) {
-          newAxiom += expansion.postcondition;
-        } else {
-          newAxiom += symbol;
-        }
-      }
-    }
-    axiom = newAxiom;
-    newAxiom = "";
-  }
-  for (let j = 0; j < axiom.length; j++) {
-    let symbol: string = axiom.charAt(j);
-    if (symbol == "[") {
-      let copy = new Turtle(vec3.clone(turtle.position), vec3.clone(turtle.forward), vec3.clone(turtle.right), vec3.clone(turtle.up));
-      stack.push(copy);
-      continue;
-    } else if (symbol == "]") {
-      let popped = stack.pop();
-      turtle.position = popped.position;
-      turtle.forward = popped.forward;
-      turtle.right = popped.right;
-      turtle.up = popped.up;
-      continue;
-    } 
-    let drawRule: DrawingRule = drawRules.get(symbol);
-    if (drawRule == null) {
-      continue;
-    }
-    drawRule.drawRule();
-    // create translate, rotate, scale vec4s for instance rendering of the cylinder
-    // use turtle position as translate (change turtle to start at 000) 
-    if (drawRule.mesh != null) {
-      offsetsArray.push(turtle.position[0]);
-      offsetsArray.push(turtle.position[1]);
-      offsetsArray.push(turtle.position[2]);
-
-      colorsArray.push(.8);
-      colorsArray.push(.4);
-      colorsArray.push(.4);
-      colorsArray.push(1.0);
-    }
-  }
-  let offsets: Float32Array = new Float32Array(offsetsArray);
-  let colors: Float32Array = new Float32Array(colorsArray);
-  square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // grid of "particles"
-}
-
 function loadScene() {
   square = new Square();
   square.create();
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  let obj0: string = readTextFile('./src/cube.obj');
-  // let obj0: string = readTextFile('./src/cylinder.obj');
+  let obj0: string = readTextFile('./src/cylinder.obj');
   cylinder = new Mesh(obj0, vec3.fromValues(0, 0, 0));
   cylinder.create();
 
@@ -140,8 +60,8 @@ function loadScene() {
   let n: number = 10.0;
   for(let i = 0; i < n; i++) {
     for(let j = 0; j < n; j++) {
-      offsetsArray.push(i);
-      offsetsArray.push(j);
+      offsetsArray.push(2 * i);
+      offsetsArray.push(2 * j);
       offsetsArray.push(0);
 
       colorsArray.push(i / n);
@@ -154,8 +74,8 @@ function loadScene() {
   let colors: Float32Array = new Float32Array(colorsArray);
   square.setInstanceVBOs(offsets, colors);
   square.setNumInstances(n * n); // grid of "particles"
-  // cylinder.setInstanceVBOs(offsets, colors);
-  // cylinder.setNumInstances(n * n);
+  cylinder.setInstanceVBOs(offsets, colors);
+  cylinder.setNumInstances(n * n);
 }
 
 function main() {
@@ -181,15 +101,22 @@ function main() {
   setGL(gl);
 
   // Initial call to load scene
-  loadScene();
-  // lSystemParse();
+  // loadScene();
+  let obj0: string = readTextFile('./src/cylinder.obj');
+  cylinder = new Mesh(obj0, vec3.fromValues(0, 0, 0));
+  cylinder.create();
+  screenQuad = new ScreenQuad();
+  screenQuad.create();
+  let lSystem: LSystem = new LSystem(cylinder);
+  lSystem.lSystemParse();
 
-  const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 0, 20), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
+  renderer.setClearColor(0.7, 0.7, 1, 1);
+  gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
+  // gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
 
   const instancedShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/instanced-vert.glsl')),
@@ -209,7 +136,7 @@ function main() {
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    renderer.render(camera, flat, [screenQuad]);
+    //renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [
       cylinder
     ]);
