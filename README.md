@@ -5,7 +5,7 @@ Sharon Dong (PennKey: sharondo)
 
 ![screenshot](images/lights.gif)
 
-## L-system
+## Tree Implementation
 - The tree is created using 5 different expansion rules and many, many drawing rules. I started with a set of rules from http://paulbourke.net/fractals/lsys/, and then modified it to what I wanted. Then I translated this into 3D.
 
 Original            |  Modified
@@ -14,6 +14,7 @@ Original            |  Modified
 
 - Many drawing operations use randomness to pick an angle that will control how to draw a branch or pine needle
 - There are 3 different objs used for: trunk/branch, pine needle, light
+- The lights are animated by creating a grid over the screen and mapping each fragment's position to a grid square in order to attempt to group fragments on the same light together. Then I animate each grid square based on a random value to get the appearance of flickering lights.
 
 ## Modifiable Features
 - Color of the lights
