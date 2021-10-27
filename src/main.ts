@@ -142,7 +142,6 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/flat-frag.glsl')),
   ]);
 
-  // This function will be called every frame
   function tick() {
     if (angle.angle != prevAngle) {
       prevAngle = angle.angle;
