@@ -6,9 +6,9 @@ Sharon Dong (PennKey: sharondo)
 ![screenshot](lights.gif)
 
 ## L-system
-- The tree is created using 5 different expansion rules and many, many drawing rules
+- The tree is created using 5 different expansion rules and many, many drawing rules. I started with 
 - Many drawing operations use randomness to pick an angle that will control how to draw a branch or pine needle
-- There are 3 different objs used 
+- There are 3 different objs used for: trunk/branch, pine needle, light
 
 Helpful links:
 http://paulbourke.net/fractals/lsys/
@@ -27,5 +27,7 @@ Spareseness level 1        |  Spareseness level 2
 :-------------------------:|:-------------------------:
 ![](treeSparse1.PNG)  |  ![](treeSparse2.PNG)
 
-## Background
-
+## Backdrop
+- Stars placed with voronoi points
+- Mountain range and horizon line sillouettes created with 1D fbm
+- Sky and ground gradient interpolated with bias function
