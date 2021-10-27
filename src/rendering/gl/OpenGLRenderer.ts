@@ -1,4 +1,4 @@
-import {mat4, vec4, mat3} from 'gl-matrix';
+import {mat4, vec4, mat3, vec3} from 'gl-matrix';
 import Drawable from './Drawable';
 import Camera from '../../Camera';
 import {gl} from '../../globals';
@@ -22,10 +22,9 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  render(camera: Camera, prog: ShaderProgram, drawables: Array<Drawable>) {
+  render(camera: Camera, prog: ShaderProgram, drawables: Array<Drawable>, color: Array<number>) {
     let model = mat4.create();
     let viewProj = mat4.create();
-    let color = vec4.fromValues(1, 0, 0, 1);
     // Each column of the axes matrix is an axis. Right, Up, Forward.
     let axes = mat3.fromValues(camera.right[0], camera.right[1], camera.right[2],
                                camera.up[0], camera.up[1], camera.up[2],
@@ -38,6 +37,7 @@ class OpenGLRenderer {
     prog.setModelMatrix(model);
     prog.setViewProjMatrix(viewProj);
     prog.setCameraAxes(axes);
+    prog.setColor(vec3.fromValues(color[0]/255, color[1]/255, color[2]/255));
 
     for (let drawable of drawables) {
       prog.draw(drawable);

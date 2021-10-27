@@ -32,10 +32,10 @@ void main()
 
     // vec3 billboardPos = offset + vec3(vs_Pos);
     // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];
-
+    mat4 scale = mat4(vec4(.1, 0, 0, 0), vec4(0, .1, 0, 0), vec4(0, 0, .1, 0), vec4(0, -4.2, 0, 1));
     mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);
     vec4 pos = vs_Pos;
-    pos = transform * vec4(vec3(pos), 1);
+    pos = scale * transform * vec4(vec3(pos), 1);
     fs_Pos = pos;
     gl_Position = u_ViewProj * pos;
 }

@@ -14,16 +14,7 @@ import Mesh from './geometry/Mesh';
 import LSystem from './lsystem/LSystem';
 
 
-/* l system for 2D (should I use a geometry for the pine needles?)
-angle: 38
-axiom: FFFFFFFV
-rules:
-V=[+++W][---X]Y[+++W][---X]Y[+++W][---X]Y[+++W][---X]V
-W=+X[-WW]Z
-X=-W[+XX]Z
-Y=YZ
-Z=[+FF][-FF]F
-
+/* 
 Other plans:
 - add lights and/or ornaments 
 - randomness in needle angle or ornament color
@@ -37,8 +28,12 @@ const controls = {
 
 let square: Square;
 let cylinder: Mesh;
+let needle: Mesh;
+let light: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
+let prevAngle: number = 3.0;
+let prevBranchSparse: number = 0.0;
 
 function loadScene() {
   square = new Square();
@@ -89,6 +84,18 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  var color = {
+    color: [255., 255., 5.], // RGB array
+  };
+  gui.addColor(color, 'color').name('Lights Color');
+  var angle = {
+    angle: 3.0
+  };
+  gui.add(angle, 'angle', 0, 5).step(1).name('Branches Angle');
+  var sparseness = {
+    sparseness: 0
+  };
+  gui.add(sparseness, 'sparseness', 0, 3).step(1).name('Sparseness');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -101,14 +108,20 @@ function main() {
   setGL(gl);
 
   // Initial call to load scene
-  // loadScene();
+  loadScene();
   let obj0: string = readTextFile('./src/cylinder.obj');
   cylinder = new Mesh(obj0, vec3.fromValues(0, 0, 0));
   cylinder.create();
+  let obj1: string = readTextFile('./src/needle.obj');
+  needle = new Mesh(obj1, vec3.fromValues(0, 0, 0));
+  needle.create();
+  let obj2: string = readTextFile('./src/light.obj');
+  light = new Mesh(obj2, vec3.fromValues(0, 0, 0));
+  light.create();
   screenQuad = new ScreenQuad();
   screenQuad.create();
-  let lSystem: LSystem = new LSystem(cylinder);
-  lSystem.lSystemParse();
+  let lSystem: LSystem = new LSystem(cylinder, needle, light);
+  lSystem.lSystemParse(angle.angle, sparseness.sparseness);
 
   const camera = new Camera(vec3.fromValues(0, 0, 20), vec3.fromValues(0, 0, 0));
 
@@ -116,6 +129,7 @@ function main() {
   renderer.setClearColor(0.7, 0.7, 1, 1);
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   // gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
 
   const instancedShader = new ShaderProgram([
@@ -130,16 +144,27 @@ function main() {
 
   // This function will be called every frame
   function tick() {
+    if (angle.angle != prevAngle) {
+      prevAngle = angle.angle;
+      lSystem = new LSystem(cylinder, needle, light);
+      lSystem.lSystemParse(angle.angle, sparseness.sparseness);
+    }
+    if (sparseness.sparseness != prevBranchSparse) {
+      prevBranchSparse = sparseness.sparseness;
+      lSystem = new LSystem(cylinder, needle, light);
+      lSystem.lSystemParse(angle.angle, sparseness.sparseness);
+    }
     camera.update();
     // stats.begin();
     instancedShader.setTime(time);
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    //renderer.render(camera, flat, [screenQuad]);
+    renderer.render(camera, flat, [screenQuad], color.color);
     renderer.render(camera, instancedShader, [
-      cylinder
-    ]);
+      cylinder, needle, light
+    ],
+    color.color);
     // stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

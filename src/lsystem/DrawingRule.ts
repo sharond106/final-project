@@ -6,18 +6,18 @@ class DrawingRule {
   symbol: string;
   mesh: Drawable;
   color: vec4;
-  rule: any;
+  rules: any[];
 
-  constructor(symbol: string, mesh: Drawable, color: vec4, rule: any) {
+  constructor(symbol: string, mesh: Drawable, color: vec4, rules: any[]) {
     this.symbol = symbol;
     this.mesh = mesh;
     this.color = color;
-    this.rule = rule;
+    this.rules = rules;
   }
 
   drawRule() {
-    if (this.rule != null) {
-      this.rule();
+    if (this.rules.length > 0) {
+      this.rules[Math.floor(Math.random() * this.rules.length)]();
     }
 
   }

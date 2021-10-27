@@ -96,6 +96,13 @@ class Mesh extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
   }
 
+  setColorsVBOs(colors: Float32Array) {
+    this.colors = colors;
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+  }
+
   setRotateVBOs(col0: Float32Array, col1: Float32Array, col2: Float32Array, col3: Float32Array) {
     this.generateRotationCol0();
     this.generateRotationCol1();
