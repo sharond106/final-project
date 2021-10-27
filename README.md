@@ -1,16 +1,16 @@
 # CIS 566 Homework 4: L-systemss
 Sharon Dong (PennKey: sharondo)
 
-![screenshot](christmastree.PNG)
+![screenshot](images/christmastree.PNG)
 
-![screenshot](lights.gif)
+![screenshot](images/lights.gif)
 
 ## L-system
 - The tree is created using 5 different expansion rules and many, many drawing rules. I started with a set of rules from http://paulbourke.net/fractals/lsys/, and then modified it to what I wanted. Then I translated this into 3D.
 
 Original            |  Modified
 :-------------------------:|:-------------------------:
-![](lsystem1.PNG)  |  ![](lsystem2.PNG)
+![](images/lsystem1.PNG)  |  ![](images/lsystem2.PNG)
 
 - Many drawing operations use randomness to pick an angle that will control how to draw a branch or pine needle
 - There are 3 different objs used for: trunk/branch, pine needle, light
@@ -21,13 +21,13 @@ Original            |  Modified
 
 Angle level 0             |  Angle level 5
 :-------------------------:|:-------------------------:
-![](treeAngle1.PNG)  |  ![](treeAngle2.PNG)
+![](images/treeAngle1.PNG)  |  ![](images/treeAngle2.PNG)
 
 - Spareseness of the pine needles changes by adding symbols to expansion rules
 
 Spareseness level 1        |  Spareseness level 2
 :-------------------------:|:-------------------------:
-![](treeSparse1.PNG)  |  ![](treeSparse2.PNG)
+![](images/treeSparse1.PNG)  |  ![](images/treeSparse2.PNG)
 
 ## Backdrop
 - Stars placed with voronoi points
