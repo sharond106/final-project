@@ -105,19 +105,19 @@ TypeScript's `bind` operation sets the `this` variable inside the bound function
 
 Andrea Lin:
 
-[![](andreaLin.png)](http://andrea-lin.com/Project3-LSystems/)
+[![](images/andreaLin.png)](http://andrea-lin.com/Project3-LSystems/)
 
 Ishan Ranade:
 
-[![](ishanRanade.png)](https://ishanranade.github.io/homework-4-l-systems-IshanRanade/)
+[![](images/ishanRanade.png)](https://ishanranade.github.io/homework-4-l-systems-IshanRanade/)
 
 Joe Klinger:
 
-[![](joeKlinger.png)](https://klingerj.github.io/Project3-LSystems/)
+[![](images/joeKlinger.png)](https://klingerj.github.io/Project3-LSystems/)
 
 Linshen Xiao:
 
-[![](linshenXiao.png)](https://githublsx.github.io/homework-4-l-systems-githublsx/)
+[![](images/linshenXiao.png)](https://githublsx.github.io/homework-4-l-systems-githublsx/)
 
 ## Useful Resources
 - [The Algorithmic Beauty of Plants](http://algorithmicbotany.org/papers/abop/abop-ch1.pdf)
