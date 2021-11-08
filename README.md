@@ -1,6 +1,11 @@
 # final-project
 
-This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing.
+This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. To help structure your time, we're breaking down the project into 4 milestones
+
+## Milestone 1: Project planning (due 11/15)
+## Milestone 2: Implementation part 1 (due 11/22)
+## Milestone 3: Implementation part 2 (due 11/29)
+## Final submission (due 12/6)
 
 In order to begin choosing the topic of your final project, we ask you to write a design document:
 
