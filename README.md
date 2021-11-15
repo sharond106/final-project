@@ -1,3 +1,5 @@
+Sharon Dong and David Li
+
 # Introduction
 We are both interested in experimenting and learning about shape grammars, as it is a super cool extension of L-systems! Due to the time constraints of this project, we thought that the style of Greek villas would be a reasonable visual target for our building generator as they are relatively simple boxy structures, but they still have a cohesive style.
 
