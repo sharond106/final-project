@@ -6175,7 +6175,7 @@ function main() {
     screenQuad.create();
     let lSystem = new __WEBPACK_IMPORTED_MODULE_9__lsystem_LSystem__["a" /* default */](cylinder, needle, light);
     lSystem.lSystemParse(angle.angle, sparseness.sparseness);
-    const camera = new __WEBPACK_IMPORTED_MODULE_5__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 20), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
+    const camera = new __WEBPACK_IMPORTED_MODULE_5__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_4__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor(0.7, 0.7, 1, 1);
     gl.enable(gl.DEPTH_TEST);
@@ -13379,6 +13379,7 @@ class Camera {
         this.controls = CameraControls(canvas, {
             position: position,
             center: target,
+            eye: position
         });
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.target, this.position, this.direction);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].lookAt(this.viewMatrix, this.controls.eye, this.controls.center, this.controls.up);
