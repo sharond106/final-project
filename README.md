@@ -1,38 +1,47 @@
-# CIS 566 Homework 4: L-systemss
-Sharon Dong (PennKey: sharondo)
+Sharon Dong and David Li
 
-Live Demo: https://sharond106.github.io/hw04-l-systems/  
+# Introduction
+We are both interested in experimenting and learning about shape grammars, as it is a super cool extension of L-systems! Due to the time constraints of this project, we thought that the style of Greek villas would be a reasonable visual target for our building generator as they are relatively simple boxy structures, but they still have a cohesive style.
 
-![screenshot](images/christmastree.PNG)
+# Goal
+Our goal is to create a building generator using shape grammars implemented with Typescript and WebGL.
 
-![screenshot](images/lights.gif)
+# Inspiration/reference
+Greek villas
 
-## Tree Implementation
-- The tree is created using 5 different expansion rules and many, many drawing rules. I started with a set of rules from http://paulbourke.net/fractals/lsys/, and then modified it to what I wanted. Then I translated this into 3D.
+![](https://nyc3.digitaloceanspaces.com/arcadia-media/2020/07/VillaSenna3353-750x500.jpg)
 
-Original            |  Modified
-:-------------------------:|:-------------------------:
-![](images/lsystem1.PNG)  |  ![](images/lsystem2.PNG)
+![](https://s3-eu-central-1.amazonaws.com/loggia-cdn/lodgeContent/01d24099e4db0e98867fb994471fbb19.jpg) 
 
-- Many drawing operations use randomness to pick an angle that will control how to draw a branch or pine needle
-- There are 3 different objs used for: trunk/branch, pine needle, light
-- The lights are animated by creating a grid over the screen and mapping each fragment's position to a grid square in order to attempt to group fragments on the same light together. Then I animate each grid square based on a random value to get the appearance of flickering lights.
+![](https://thebespoketravelclub.com/wp-content/uploads/2019/10/five-star-greece-hero-2400x1000.jpg)
 
-## Modifiable Features
-- Color of the lights
-- Angle of the tree branches changes by setting the angle of drawing rules
+# Specification
+For our first milestone, we plan to create a simpler building generator that basically merges and organizes different shapes together, without worrying about layouts or subdividing geometry. This will involve:
+- Grammar rules- rules for how different shapes connect together
+- Rendering rules- rules for which models, colors, and reflection types to use for different shapes 
+- Parser - the parser will go through the set and replace symbols using the set of grammar rules
+- Geometry - models for different polygons that will be used 
 
-Angle level 0             |  Angle level 5
-:-------------------------:|:-------------------------:
-![](images/treeAngle1.PNG)  |  ![](images/treeAngle2.PNG)
+As a stretch goal, we would like to implement the ability to subdivide geometry, such as creating floors from walls, and wall units with windows from floors. These rules would be part of grammar rules refactored into a polygon library.
+- Polygon Library - a series of functions that perform operations such as geometry subdivision 
 
-- Spareseness of the pine needles changes by adding symbols to expansion rules
+# Techniques
+L-systems: https://cis566-procedural-graphics.github.io/lsystems.pdf
 
-Spareseness level 1        |  Spareseness level 2
-:-------------------------:|:-------------------------:
-![](images/treeSparse1.PNG)  |  ![](images/treeSparse2.PNG)
+Shape-grammars: https://cis566-procedural-graphics.github.io/shape_grammar.pdf
 
-## Backdrop
-- Stars placed with voronoi points
-- Mountain range and horizon line sillouettes created with 1D fbm
-- Sky and ground gradient interpolated with bias function
+# Design
+![](design.PNG)
+
+# Timeline
+Week 1:
+- David: Model three simple shapes for use. Write rules to place these shapes
+- Sharon: Refactor L-system code to use a shape grammar parser
+
+Week 2: 
+- David: Refine grammar rules and help develop rendering rules
+- Sharon: Refactor rendering rules to fit shape grammars
+
+Week 3:
+- David: Bug fixes, polygon library, subdivision
+- Sharon: Bug fixes, polygon library, cut out
