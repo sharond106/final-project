@@ -123,7 +123,7 @@ function main() {
   let lSystem: LSystem = new LSystem(cylinder, needle, light);
   lSystem.lSystemParse(angle.angle, sparseness.sparseness);
 
-  const camera = new Camera(vec3.fromValues(0, 0, 20), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 0, 10), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.7, 0.7, 1, 1);
