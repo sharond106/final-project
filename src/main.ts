@@ -12,14 +12,7 @@ import DrawingRule from './lsystem/DrawingRule';
 import Turtle from './lsystem/Turtle';
 import Mesh from './geometry/Mesh';
 import LSystem from './lsystem/LSystem';
-
-
-/* 
-Other plans:
-- add lights and/or ornaments 
-- randomness in needle angle or ornament color
-- gui modifiable (3): light/ornament color, angle of branches, how sparse the needles are (add Fs to Z=[+FF][-FF]FFFFFF)
-*/
+import Parser from './shapegrammar/Parser';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -27,51 +20,13 @@ const controls = {
 };
 
 let square: Square;
-let cylinder: Mesh;
-let needle: Mesh;
-let light: Mesh;
+let box1: Mesh;
+let box2: Mesh;
+let box3: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
 let prevAngle: number = 3.0;
 let prevBranchSparse: number = 0.0;
-
-function loadScene() {
-  square = new Square();
-  square.create();
-  screenQuad = new ScreenQuad();
-  screenQuad.create();
-
-  let obj0: string = readTextFile('./src/cylinder.obj');
-  cylinder = new Mesh(obj0, vec3.fromValues(0, 0, 0));
-  cylinder.create();
-
-  // Set up instanced rendering data arrays here.
-  // This example creates a set of positional
-  // offsets and gradiated colors for a 100x100 grid
-  // of squares, even though the VBO data for just
-  // one square is actually passed to the GPU
-  let offsetsArray = [];
-  let colorsArray = [];
-  let n: number = 10.0;
-  for(let i = 0; i < n; i++) {
-    for(let j = 0; j < n; j++) {
-      offsetsArray.push(2 * i);
-      offsetsArray.push(2 * j);
-      offsetsArray.push(0);
-
-      colorsArray.push(i / n);
-      colorsArray.push(j / n);
-      colorsArray.push(1.0);
-      colorsArray.push(1.0); // Alpha channel
-    }
-  }
-  let offsets: Float32Array = new Float32Array(offsetsArray);
-  let colors: Float32Array = new Float32Array(colorsArray);
-  square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // grid of "particles"
-  cylinder.setInstanceVBOs(offsets, colors);
-  cylinder.setNumInstances(n * n);
-}
 
 function main() {
   // Initial display for framerate
@@ -87,15 +42,15 @@ function main() {
   var color = {
     color: [255., 255., 5.], // RGB array
   };
-  gui.addColor(color, 'color').name('Lights Color');
-  var angle = {
-    angle: 3.0
-  };
-  gui.add(angle, 'angle', 0, 5).step(1).name('Branches Angle');
-  var sparseness = {
-    sparseness: 0
-  };
-  gui.add(sparseness, 'sparseness', 0, 3).step(1).name('Sparseness');
+  // gui.addColor(color, 'color').name('Lights Color');
+  // var angle = {
+  //   angle: 3.0
+  // };
+  // gui.add(angle, 'angle', 0, 5).step(1).name('Branches Angle');
+  // var sparseness = {
+  //   sparseness: 0
+  // };
+  // gui.add(sparseness, 'sparseness', 0, 3).step(1).name('Sparseness');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -107,21 +62,21 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-  // Initial call to load scene
-  loadScene();
-  let obj0: string = readTextFile('./src/cylinder.obj');
-  cylinder = new Mesh(obj0, vec3.fromValues(0, 0, 0));
-  cylinder.create();
-  let obj1: string = readTextFile('./src/needle.obj');
-  needle = new Mesh(obj1, vec3.fromValues(0, 0, 0));
-  needle.create();
-  let obj2: string = readTextFile('./src/light.obj');
-  light = new Mesh(obj2, vec3.fromValues(0, 0, 0));
-  light.create();
+  let obj0: string = readTextFile('./Meshes/box1.obj');
+  box1 = new Mesh(obj0, vec3.fromValues(0, 0, 0));
+  box1.create();
+  let obj1: string = readTextFile('./Meshes/box2.obj');
+  box2 = new Mesh(obj1, vec3.fromValues(0, 0, 0));
+  box2.create();
+  let obj2: string = readTextFile('./Meshes/box3.obj');
+  box3 = new Mesh(obj2, vec3.fromValues(0, 0, 0));
+  box3.create();
+  
   screenQuad = new ScreenQuad();
   screenQuad.create();
-  let lSystem: LSystem = new LSystem(cylinder, needle, light);
-  lSystem.lSystemParse(angle.angle, sparseness.sparseness);
+
+  let shapeGrammar: Parser = new Parser(1, box1, box2, box3);
+  shapeGrammar.parse();
 
   const camera = new Camera(vec3.fromValues(0, 0, 10), vec3.fromValues(0, 0, 0));
 
@@ -143,16 +98,6 @@ function main() {
   ]);
 
   function tick() {
-    if (angle.angle != prevAngle) {
-      prevAngle = angle.angle;
-      lSystem = new LSystem(cylinder, needle, light);
-      lSystem.lSystemParse(angle.angle, sparseness.sparseness);
-    }
-    if (sparseness.sparseness != prevBranchSparse) {
-      prevBranchSparse = sparseness.sparseness;
-      lSystem = new LSystem(cylinder, needle, light);
-      lSystem.lSystemParse(angle.angle, sparseness.sparseness);
-    }
     camera.update();
     // stats.begin();
     instancedShader.setTime(time);
@@ -161,7 +106,7 @@ function main() {
     renderer.clear();
     renderer.render(camera, flat, [screenQuad], color.color);
     renderer.render(camera, instancedShader, [
-      cylinder, needle, light
+      box1, box2, box3
     ],
     color.color);
     // stats.end();

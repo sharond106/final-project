@@ -92,7 +92,7 @@ class Shape {
     this.scale[2] *= factor;
   }
 
-  getMatrix(oldPos: vec3): mat4 {
+  getMatrix(): mat4 {
     let translate: mat4 = mat4.create();
     mat4.fromTranslation(translate, this.position);
 
