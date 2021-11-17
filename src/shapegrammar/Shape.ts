@@ -3,23 +3,24 @@ import Drawable from '../rendering/gl/Drawable';
 
 class Shape {
   symbol: string;
-  geometry: Drawable;
   position: vec3;
   forward: vec3;
   right: vec3;
   up: vec3;
   scale: vec3;
-  terminal: boolean;
 
-  constructor(symbol: string, geo: Drawable, pos: vec3, f: vec3, r: vec3, u: vec3, s: vec3, terminal: boolean) {
+  constructor(symbol: string,  pos: vec3, f: vec3, r: vec3, u: vec3, s: vec3) {
     this.symbol = symbol;
-    this.geometry = geo;
     this.position = pos;
     this.forward = f;
     this.right = r;
     this.up = u;
     this.scale = s;
-    this.terminal = terminal;
+  }
+
+  copy() {
+    return new Shape(this.symbol, vec3.clone(this.position), vec3.clone(this.forward), 
+                     vec3.clone(this.right), vec3.clone(this.up), vec3.clone(this.scale));
   }
 
   moveForward(stepSize: number) {
