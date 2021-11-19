@@ -24,15 +24,15 @@ class Shape {
   }
 
   moveForward(stepSize: number) {
-    this.move(this.forward, stepSize);
+    this.move(vec3.fromValues(0, 0, 1), stepSize);
   }
 
   moveRight(stepSize: number) {
-    this.move(this.right, stepSize);
+    this.move(vec3.fromValues(1, 0, 0), stepSize);
   }
 
   moveUp(stepSize: number) {
-    this.move(this.up, stepSize);
+    this.move(vec3.fromValues(0, 1, 0), stepSize);
   }
 
   move(dir: vec3, step: number) {
@@ -93,6 +93,7 @@ class Shape {
   }
 
   getMatrix(): mat4 {
+    console.log(this.symbol + ' ' + this.scale);
     let translate: mat4 = mat4.create();
     mat4.fromTranslation(translate, this.position);
 

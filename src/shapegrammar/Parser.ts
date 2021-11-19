@@ -1,6 +1,7 @@
 import GrammarRule from "./GrammarRule";
 import Shape from "./Shape";
 import Mesh from "../geometry/Mesh";
+import TransformationRule from "./TransformationRule";
 import {glMatrix, mat4, vec3, vec4} from 'gl-matrix';
 
 
@@ -21,12 +22,35 @@ class Parser {
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
   initShapes() {
-    this.terminalShapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
+    this.shapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
+    this.terminalMap.set("B", true);
+  }
+
+  initRule(nextSymbols: string[], 
+    tx: number[], ty: number[], tz: number[], 
+    rx: number[], ry: number[], rz: number[],
+    sx: number[], sy: number[], sz: number[]) : GrammarRule {
+    
+    let tRules: TransformationRule[] = [];
+
+    for (let i = 0; i < nextSymbols.length; i++) {
+      tRules.push(new TransformationRule(tx[i], ty[i], tz[i], rx[i], ry[i], rz[i], sx[i], sy[i], sz[i]))
+    }
+    return new GrammarRule(nextSymbols, tRules);
+  }
+
+  initEntry(symbol: string, rule: GrammarRule) {
+    if (this.grammarRules.has(symbol)) {
+      this.grammarRules.get(symbol).push(rule);
+    } else {
+      this.grammarRules.set(symbol, [rule]); 
+    }
   }
 
   // Initialize this.grammarRules
   initRules() {
-    
+    this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, -1], [0, 0], [0, 90], [0, 0], [1, 1], [1, 1], [1, 1]));
   }
 
   // Expands this.shapes and this.terminalShapes for this.iterations
@@ -35,6 +59,7 @@ class Parser {
       let newShapes: Shape[] = [];
       for (let j = 0; j < this.shapes.length; j++) {
         let currShape: Shape = this.shapes[j];
+        console.log(currShape.symbol);
         // Check if shape is terminal
         if (this.terminalMap.get(currShape.symbol) == true) {
           this.terminalShapes.push(currShape);
@@ -42,9 +67,9 @@ class Parser {
         }
         // Get the symbol's successors and save them until next iteration
         let rules: GrammarRule[] = this.grammarRules.get(currShape.symbol);
-        let rule: GrammarRule = rules[this.getRandomNum(0, rules.length)];
+        let rule: GrammarRule = rules[Math.floor(Math.random() * rules.length)];
         let successors: Shape[] = rule.expand(currShape);
-        newShapes.concat(successors);
+        newShapes = newShapes.concat(successors);
       }
       this.shapes = newShapes;
     }
@@ -111,6 +136,10 @@ class Parser {
     this.initShapes();
     this.initRules();
     this.expand();
+    for (let i = 0; i < this.shapes.length; i++) {
+      console.log(this.shapes[i].symbol + " " + this.shapes[i].position);
+    }
+    
     this.draw();
   }
 }

@@ -75,7 +75,7 @@ function main() {
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  let shapeGrammar: Parser = new Parser(1, box1, box2, box3);
+  let shapeGrammar: Parser = new Parser(3, box1, box2, box3);
   shapeGrammar.parse();
 
   const camera = new Camera(vec3.fromValues(0, 0, 10), vec3.fromValues(0, 0, 0));

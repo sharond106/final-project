@@ -36,22 +36,22 @@ class TransformationRule {
       shape.moveForward(this.tz);
     }
     if (this.rx != 0) {
-      shape.rotateAboutRight(this.tx);
+      shape.rotateAboutRight(this.rx);
     }
     if (this.ry != 0) {
-      shape.rotateAboutUp(this.ty);
+      shape.rotateAboutUp(this.ry);
     }
     if (this.rz != 0) {
-      shape.rotateAboutForward(this.tz);
+      shape.rotateAboutForward(this.rz);
     }
-    if (this.sx != 0) {
-      shape.scaleX(this.tx);
+    if (this.sx != 1) {
+      shape.scaleX(this.sx);
     }
-    if (this.sy != 0) {
-      shape.scaleY(this.ty);
+    if (this.sy != 1) {
+      shape.scaleY(this.sy);
     }
-    if (this.sz != 0) {
-      shape.scaleZ(this.tz);
+    if (this.sz != 1) {
+      shape.scaleZ(this.sz);
     }
     return shape;
   }

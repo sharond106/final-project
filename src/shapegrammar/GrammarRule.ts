@@ -1,12 +1,13 @@
 import TransformationRule from "./TransformationRule";
 import Shape from "./Shape";
 
-// Maps a symbol to a list of possible resulting symbols and their transformations
+// Maps a symbol to its resulting symbols and their transformations (should be of same length)
 class GrammarRule {
   nextSymbols: string[];
   transformations: TransformationRule[];
 
-  constructor(rules: TransformationRule[]) {
+  constructor(nextSymbols: string[], rules: TransformationRule[]) {
+    this.nextSymbols = nextSymbols;
     this.transformations = rules;
   }
 
@@ -15,9 +16,10 @@ class GrammarRule {
     for (let i = 0; i < this.nextSymbols.length; i++) {
       let s: Shape = shape.copy();
       s.symbol = this.nextSymbols[i];
-      shape = this.transformations[i].transform(shape);
+      s = this.transformations[i].transform(s);
       retList.push(s);
     }
+
     return retList;
   }
 }
