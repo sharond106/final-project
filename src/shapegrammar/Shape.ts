@@ -93,7 +93,6 @@ class Shape {
   }
 
   getMatrix(): mat4 {
-    console.log(this.symbol + ' ' + this.scale);
     let translate: mat4 = mat4.create();
     mat4.fromTranslation(translate, this.position);
 

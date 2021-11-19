@@ -13,17 +13,18 @@ class Parser {
   grammarRules: Map<string, GrammarRule[]> = new Map();
   drawableMap: Map<string, Mesh> = new Map();
 
-  constructor(i: number, box1: Mesh, box2: Mesh, box3: Mesh) {
-    this.iterations = i;
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh) {
+    this.iterations = 3;
     this.drawableMap.set('A', box1);
     this.drawableMap.set('B', box2);
     this.drawableMap.set('C', box3);
+    this.drawableMap.set('D', box4);
   }
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
   initShapes() {
     this.shapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
-    this.terminalMap.set("B", true);
+    this.terminalMap.set("D", true);
   }
 
   initRule(nextSymbols: string[], 
@@ -50,7 +51,11 @@ class Parser {
   // Initialize this.grammarRules
   initRules() {
     this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, -1], [0, 0], [0, 90], [0, 0], [1, 1], [1, 1], [1, 1]));
+    this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
+    this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
+    this.initEntry("C", this.initRule(["C"], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
   }
 
   // Expands this.shapes and this.terminalShapes for this.iterations
@@ -59,7 +64,6 @@ class Parser {
       let newShapes: Shape[] = [];
       for (let j = 0; j < this.shapes.length; j++) {
         let currShape: Shape = this.shapes[j];
-        console.log(currShape.symbol);
         // Check if shape is terminal
         if (this.terminalMap.get(currShape.symbol) == true) {
           this.terminalShapes.push(currShape);
@@ -120,6 +124,7 @@ class Parser {
 
   draw() {
     let allShapes: Shape[] = this.shapes.concat(this.terminalShapes);
+    console.log("allshapes" + allShapes.length);
     this.drawableMap.forEach((value: Mesh, key: string) => {
       let keyShapes: Shape[] = [];
       //Gets all shape instances associated with that symbol
@@ -128,6 +133,7 @@ class Parser {
           keyShapes.push(allShapes[i]);
         }
       }
+      console.log("num for " + key + ", " + keyShapes.length)
       this.drawMesh(keyShapes, value);
     });
   }
@@ -135,11 +141,10 @@ class Parser {
   parse() {
     this.initShapes();
     this.initRules();
-    this.expand();
-    for (let i = 0; i < this.shapes.length; i++) {
+    this.expand(); 
+    for (let i = 0; i <this.shapes.length; i++) {
       console.log(this.shapes[i].symbol + " " + this.shapes[i].position);
     }
-    
     this.draw();
   }
 }
