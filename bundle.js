@@ -6129,7 +6129,7 @@ function main() {
     box3.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](1, box1, box2, box3);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](3, box1, box2, box3);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6139,12 +6139,12 @@ function main() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     // gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
     const instancedShader = new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(71)),
-        new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(72)),
-    ]);
-    const flat = new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(73)),
         new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(74)),
+    ]);
+    const flat = new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(75)),
+        new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(76)),
     ]);
     function tick() {
         camera.update();
@@ -16697,8 +16697,12 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GrammarRule__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Shape__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__TransformationRule__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_gl_matrix__ = __webpack_require__(1);
+
+
 
 
 class Parser {
@@ -16715,10 +16719,28 @@ class Parser {
     }
     // Initialize this.shapes, this.terminalShapes, this.terminalMap
     initShapes() {
-        this.terminalShapes.push(new __WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0), __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1)));
+        this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1)));
+        this.terminalMap.set("B", true);
+    }
+    initRule(nextSymbols, tx, ty, tz, rx, ry, rz, sx, sy, sz) {
+        let tRules = [];
+        for (let i = 0; i < nextSymbols.length; i++) {
+            tRules.push(new __WEBPACK_IMPORTED_MODULE_2__TransformationRule__["a" /* default */](tx[i], ty[i], tz[i], rx[i], ry[i], rz[i], sx[i], sy[i], sz[i]));
+        }
+        return new __WEBPACK_IMPORTED_MODULE_0__GrammarRule__["a" /* default */](nextSymbols, tRules);
+    }
+    initEntry(symbol, rule) {
+        if (this.grammarRules.has(symbol)) {
+            this.grammarRules.get(symbol).push(rule);
+        }
+        else {
+            this.grammarRules.set(symbol, [rule]);
+        }
     }
     // Initialize this.grammarRules
     initRules() {
+        this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+        this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, -1], [0, 0], [0, 90], [0, 0], [1, 1], [1, 1], [1, 1]));
     }
     // Expands this.shapes and this.terminalShapes for this.iterations
     expand() {
@@ -16726,6 +16748,7 @@ class Parser {
             let newShapes = [];
             for (let j = 0; j < this.shapes.length; j++) {
                 let currShape = this.shapes[j];
+                console.log(currShape.symbol);
                 // Check if shape is terminal
                 if (this.terminalMap.get(currShape.symbol) == true) {
                     this.terminalShapes.push(currShape);
@@ -16733,9 +16756,9 @@ class Parser {
                 }
                 // Get the symbol's successors and save them until next iteration
                 let rules = this.grammarRules.get(currShape.symbol);
-                let rule = rules[this.getRandomNum(0, rules.length)];
+                let rule = rules[Math.floor(Math.random() * rules.length)];
                 let successors = rule.expand(currShape);
-                newShapes.concat(successors);
+                newShapes = newShapes.concat(successors);
             }
             this.shapes = newShapes;
         }
@@ -16797,6 +16820,9 @@ class Parser {
         this.initShapes();
         this.initRules();
         this.expand();
+        for (let i = 0; i < this.shapes.length; i++) {
+            console.log(this.shapes[i].symbol + " " + this.shapes[i].position);
+        }
         this.draw();
     }
 }
@@ -16805,6 +16831,31 @@ class Parser {
 
 /***/ }),
 /* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// Maps a symbol to its resulting symbols and their transformations (should be of same length)
+class GrammarRule {
+    constructor(nextSymbols, rules) {
+        this.nextSymbols = nextSymbols;
+        this.transformations = rules;
+    }
+    expand(shape) {
+        let retList = [];
+        for (let i = 0; i < this.nextSymbols.length; i++) {
+            let s = shape.copy();
+            s.symbol = this.nextSymbols[i];
+            s = this.transformations[i].transform(s);
+            retList.push(s);
+        }
+        return retList;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (GrammarRule);
+
+
+/***/ }),
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16823,13 +16874,13 @@ class Shape {
         return new Shape(this.symbol, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].clone(this.position), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].clone(this.forward), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].clone(this.right), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].clone(this.up), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].clone(this.scale));
     }
     moveForward(stepSize) {
-        this.move(this.forward, stepSize);
+        this.move(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 1), stepSize);
     }
     moveRight(stepSize) {
-        this.move(this.right, stepSize);
+        this.move(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), stepSize);
     }
     moveUp(stepSize) {
-        this.move(this.up, stepSize);
+        this.move(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), stepSize);
     }
     move(dir, step) {
         let offset = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
@@ -16882,6 +16933,7 @@ class Shape {
         this.scale[2] *= factor;
     }
     getMatrix() {
+        console.log(this.symbol + ' ' + this.scale);
         let translate = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].fromTranslation(translate, this.position);
         let rotate = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].create();
@@ -16897,25 +16949,77 @@ class Shape {
 
 
 /***/ }),
-/* 71 */
-/***/ (function(module, exports) {
-
-module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\nin vec4 vs_transform_col0;\nin vec4 vs_transform_col1;\nin vec4 vs_transform_col2;\nin vec4 vs_transform_col3;\nin vec3 vs_Scale;\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    // fs_Pos = vs_Pos;\n    fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vec3(vs_Pos);\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 scale = mat4(vec4(.1, 0, 0, 0), vec4(0, .1, 0, 0), vec4(0, 0, .1, 0), vec4(0, -4.2, 0, 1));\n    mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);\n    vec4 pos = vs_Pos;\n    pos = transform * vec4(vec3(pos), 1);\n    fs_Pos = pos;\n    gl_Position = u_ViewProj * pos;\n}\n"
-
-/***/ }),
 /* 72 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_Time;\nuniform vec3 u_Color;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nfloat random1( vec3 p ) {\n  return fract(sin((dot(p, vec3(127.1,\n  311.7,\n  191.999)))) *\n  18.5453);\n}\n\nvoid main()\n{\n    vec4 lightPos = vec4(0, 30, 30, 1);\n    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));\n    // Avoid negative lighting values\n    diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);\n    float ambientTerm = 0.2;\n    float lightIntensity = diffuseTerm + ambientTerm;\n    // If this fragment is a light, flicker it\n    vec3 col = fs_Col.rgb;\n    if (fs_Col[3] < 1.) {\n        float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));\n        col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);\n    }\n    out_Col = vec4(col * lightIntensity, fs_Col[3]);\n    // out_Col = vec4(fs_Nor.rgb, 1);\n    // out_Col = vec4(1);\n}\n"
+"use strict";
+// Stores a list of resulting symbols and their transformations 
+class TransformationRule {
+    constructor(tx, ty, tz, rx, ry, rz, sx, sy, sz) {
+        this.tx = tx;
+        this.ty = ty;
+        this.tz = tz;
+        this.rx = rx;
+        this.ry = ry;
+        this.rz = rz;
+        this.sx = sx;
+        this.sy = sy;
+        this.sz = sz;
+    }
+    transform(shape) {
+        if (this.tx != 0) {
+            shape.moveRight(this.tx);
+        }
+        if (this.ty != 0) {
+            shape.moveUp(this.ty);
+        }
+        if (this.tz != 0) {
+            shape.moveForward(this.tz);
+        }
+        if (this.rx != 0) {
+            shape.rotateAboutRight(this.rx);
+        }
+        if (this.ry != 0) {
+            shape.rotateAboutUp(this.ry);
+        }
+        if (this.rz != 0) {
+            shape.rotateAboutForward(this.rz);
+        }
+        if (this.sx != 1) {
+            shape.scaleX(this.sx);
+        }
+        if (this.sy != 1) {
+            shape.scaleY(this.sy);
+        }
+        if (this.sz != 1) {
+            shape.scaleZ(this.sz);
+        }
+        return shape;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (TransformationRule);
+
 
 /***/ }),
 /* 73 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\n// The vertex shader used to render the background of the scene\n\nin vec4 vs_Pos;\nout vec2 fs_Pos;\n\nvoid main() {\n  fs_Pos = vs_Pos.xy;\n  gl_Position = vs_Pos;\n}\n"
+module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\nin vec4 vs_transform_col0;\nin vec4 vs_transform_col1;\nin vec4 vs_transform_col2;\nin vec4 vs_transform_col3;\nin vec3 vs_Scale;\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    // fs_Pos = vs_Pos;\n    fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vec3(vs_Pos);\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 scale = mat4(vec4(.1, 0, 0, 0), vec4(0, .1, 0, 0), vec4(0, 0, .1, 0), vec4(0, -4.2, 0, 1));\n    mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);\n    vec4 pos = vs_Pos;\n    pos = transform * vec4(vec3(pos), 1);\n    fs_Pos = pos;\n    gl_Position = u_ViewProj * pos;\n}\n"
 
 /***/ }),
 /* 74 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_Time;\nuniform vec3 u_Color;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nfloat random1( vec3 p ) {\n  return fract(sin((dot(p, vec3(127.1,\n  311.7,\n  191.999)))) *\n  18.5453);\n}\n\nvoid main()\n{\n    vec4 lightPos = vec4(0, 30, 30, 1);\n    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));\n    // Avoid negative lighting values\n    diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);\n    float ambientTerm = 0.2;\n    float lightIntensity = diffuseTerm + ambientTerm;\n    // If this fragment is a light, flicker it\n    vec3 col = fs_Col.rgb;\n    if (fs_Col[3] < 1.) {\n        float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));\n        col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);\n    }\n    out_Col = vec4(col * lightIntensity, fs_Col[3]);\n    // out_Col = vec4(fs_Nor.rgb, 1);\n    // out_Col = vec4(1);\n}\n"
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\nprecision highp float;\n\n// The vertex shader used to render the background of the scene\n\nin vec4 vs_Pos;\nout vec2 fs_Pos;\n\nvoid main() {\n  fs_Pos = vs_Pos.xy;\n  gl_Position = vs_Pos;\n}\n"
+
+/***/ }),
+/* 76 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\nfloat noise1D(float p) {\n  return fract(sin(p) *\n  43758.5453);\n}\n\nfloat noise1D2(float p) {\n  return fract(sin(p) *\n  126548.98712);\n}\n\nfloat interpNoise1D(float x, bool version1) {\n  float intX = floor(x);\n  float fractX = fract(x);\n  float v1;\n  float v2;\n  if (version1) {\n    v1 = noise1D(intX);\n    v2 = noise1D(intX + 1.);\n  } else {\n    v1 = noise1D2(intX);\n    v2 = noise1D2(intX + 1.);\n  }\n  \n  return mix(v1, v2, fractX);\n}\n\nfloat fbm(float x, bool version1) {\n  float total = 0.;\n  float persistence = 0.5f;\n  float octaves = 8.;\n  for(float i = 1.; i <= octaves; i++) {\n    float freq = pow(2.f, i);\n    float amp = pow(persistence, i);\n    if (version1) {\n      total += interpNoise1D(x * freq, true) * amp;\n    } else {\n      total += interpNoise1D(x * freq, false) * amp;\n    }\n  }\n  return total;\n} \n\nvec2 random2( vec2 p ) {\n  return fract(sin(vec2(dot(p, vec2(127.1, 311.7)),\n  dot(p, vec2(269.5,183.3))))\n  * 43758.5453);\n}\n\nfloat WorleyNoise(vec2 uv) {\n  uv *= 7.0; // Now the space is 10x10 instead of 1x1. Change this to any number you want.\n  vec2 uvInt = floor(uv);\n  vec2 uvFract = fract(uv);\n  float minDist = 1.0; // Minimum distance initialized to max.\n  for(int y = -1; y <= 1; ++y) {\n    for(int x = -1; x <= 1; ++x) {\n      vec2 neighbor = vec2(float(x), float(y)); // Direction in which neighbor cell lies\n      vec2 point = random2(uvInt + neighbor); // Get the Voronoi centerpoint for the neighboring cell\n      vec2 diff = neighbor + point - uvFract; // Distance between fragment coord and neighbor’s Voronoi point\n      float dist = length(diff);\n      minDist = min(minDist, dist);\n    }\n  }\n  return minDist;\n}\n\nfloat GetBias(float time, float bias) {\n  return (time / ((((1.0/bias) - 2.0)*(1.0 - time))+1.0));\n}\n\nvoid main() {\n  float f = 0.;\n  vec3 col = vec3(.05, 0, .4);\n  f = fbm(fs_Pos.x, true);\n  f -= .5;\n  if (fs_Pos.y < f) {\n    col = vec3(0, 0, .1);\n  } else {\n    col = mix(vec3(.08, 0, .4), vec3(.0, 0, 0), fs_Pos.y);\n    if (fs_Pos.y > .4) {\n    col += vec3(1. - step(.009, WorleyNoise(vec2(fs_Pos.x, fs_Pos.y))));\n  }\n  }\n  f = fbm(fs_Pos.x / 1.5, false) / 4.;\n  f -= .4;\n  if (fs_Pos.y < f) {\n    col = mix(vec3(.9, .95, 1), vec3(.0, 0, .05), GetBias(fs_Pos.y + 1., .7));\n  }\n  out_Col = vec4(col, 1);\n}\n"
