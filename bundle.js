@@ -6083,6 +6083,7 @@ let square;
 let box1;
 let box2;
 let box3;
+let box4;
 let screenQuad;
 let time = 0.0;
 let prevAngle = 3.0;
@@ -6127,9 +6128,12 @@ function main() {
     let obj2 = readTextFile('./Meshes/box3.obj');
     box3 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj2, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     box3.create();
+    let obj3 = readTextFile('./Meshes/box1.obj');
+    box4 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj3, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
+    box4.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](3, box1, box2, box3);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6155,7 +6159,7 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad], color.color);
         renderer.render(camera, instancedShader, [
-            box1, box2, box3
+            box1, box2, box3, box4
         ], color.color);
         // stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
@@ -16706,21 +16710,22 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(i, box1, box2, box3) {
+    constructor(box1, box2, box3, box4) {
         this.shapes = [];
         this.terminalShapes = [];
         this.terminalMap = new Map();
         this.grammarRules = new Map();
         this.drawableMap = new Map();
-        this.iterations = i;
+        this.iterations = 3;
         this.drawableMap.set('A', box1);
         this.drawableMap.set('B', box2);
         this.drawableMap.set('C', box3);
+        this.drawableMap.set('D', box4);
     }
     // Initialize this.shapes, this.terminalShapes, this.terminalMap
     initShapes() {
         this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1)));
-        this.terminalMap.set("B", true);
+        this.terminalMap.set("D", true);
     }
     initRule(nextSymbols, tx, ty, tz, rx, ry, rz, sx, sy, sz) {
         let tRules = [];
@@ -16740,7 +16745,11 @@ class Parser {
     // Initialize this.grammarRules
     initRules() {
         this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-        this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, -1], [0, 0], [0, 90], [0, 0], [1, 1], [1, 1], [1, 1]));
+        this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
+        this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+        this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+        this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
+        this.initEntry("C", this.initRule(["C"], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
     }
     // Expands this.shapes and this.terminalShapes for this.iterations
     expand() {
@@ -16748,7 +16757,6 @@ class Parser {
             let newShapes = [];
             for (let j = 0; j < this.shapes.length; j++) {
                 let currShape = this.shapes[j];
-                console.log(currShape.symbol);
                 // Check if shape is terminal
                 if (this.terminalMap.get(currShape.symbol) == true) {
                     this.terminalShapes.push(currShape);
@@ -16805,6 +16813,7 @@ class Parser {
     }
     draw() {
         let allShapes = this.shapes.concat(this.terminalShapes);
+        console.log("allshapes" + allShapes.length);
         this.drawableMap.forEach((value, key) => {
             let keyShapes = [];
             //Gets all shape instances associated with that symbol
@@ -16813,6 +16822,7 @@ class Parser {
                     keyShapes.push(allShapes[i]);
                 }
             }
+            console.log("num for " + key + ", " + keyShapes.length);
             this.drawMesh(keyShapes, value);
         });
     }
@@ -16933,7 +16943,6 @@ class Shape {
         this.scale[2] *= factor;
     }
     getMatrix() {
-        console.log(this.symbol + ' ' + this.scale);
         let translate = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].fromTranslation(translate, this.position);
         let rotate = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].create();
