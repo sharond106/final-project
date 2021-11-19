@@ -45,3 +45,21 @@ Week 2:
 Week 3:
 - David: Bug fixes, polygon library, subdivision
 - Sharon: Bug fixes, polygon library, cut out
+
+# Milestone 2
+Implemented
+- Modeled geometry to use: 3 different sizes of cubes, 1 window + shutters
+- Created grammar rules that position and scale cubes to represent the main shape of the building
+- Implemented shape grammar parser with instanced rendering for each of the meshes
+- Started implementing polygon library and able to draw windows on top of a wall. Depending on the scale of the wall, multiple rows/cols of windows will be generated
+
+Future plans
+- Implement a way to handle intersections between windows and cubes
+- Possibly change the grammar rules
+- Add colors and shading
+- Add other decorative meshes
+- Add features to polygon library to be able to subdivide meshes in other ways
+- Create scene/background for building
+
+Example generations
+
