@@ -3,7 +3,7 @@ import Shape from "./Shape";
 import Mesh from "../geometry/Mesh";
 import TransformationRule from "./TransformationRule";
 import {glMatrix, mat4, vec3, vec4} from 'gl-matrix';
-
+import PolygonLibrary from "./PolygonLibrary";
 
 class Parser {
   iterations: number;
@@ -12,19 +12,30 @@ class Parser {
   terminalMap: Map<string, boolean> = new Map();
   grammarRules: Map<string, GrammarRule[]> = new Map();
   drawableMap: Map<string, Mesh> = new Map();
+  dimensionsMap: Map<string, vec3> = new Map();
+  polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh) {
-    this.iterations = 3;
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, window1: Mesh) {
+    this.iterations = 2;
     this.drawableMap.set('A', box1);
+    this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
+    this.dimensionsMap.set('B', vec3.fromValues(1.5, 1.5, 1.5));
     this.drawableMap.set('C', box3);
+    this.dimensionsMap.set('C', vec3.fromValues(2, 2, 2));
     this.drawableMap.set('D', box4);
+    this.dimensionsMap.set('D', vec3.fromValues(1, 1, 1));
+    this.drawableMap.set('W', window1);
+    this.dimensionsMap.set('W', vec3.fromValues(1, 1, 1));
+
+    this.polyLibrary = new PolygonLibrary(this.dimensionsMap);
   }
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
   initShapes() {
     this.shapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
     this.terminalMap.set("D", true);
+    this.terminalMap.set("W", true);
   }
 
   initRule(nextSymbols: string[], 
@@ -81,6 +92,15 @@ class Parser {
 
   getRandomNum(min: number, max: number) {
     return Math.random() * (max - min) + min;
+  }
+
+  subdivide() {
+    for (let i = 0; i < this.shapes.length; i++) {
+      let shape = this.shapes[i];
+      if (shape.symbol == "A" || shape.symbol == "C")  {
+        this.shapes = this.shapes.concat(this.polyLibrary.subdivideWindows(shape, "W"));
+      }
+    }
   }
   
   //Draws all Shapes with given Mesh
@@ -142,6 +162,7 @@ class Parser {
     this.initShapes();
     this.initRules();
     this.expand(); 
+    this.subdivide();
     for (let i = 0; i <this.shapes.length; i++) {
       console.log(this.shapes[i].symbol + " " + this.shapes[i].position);
     }
