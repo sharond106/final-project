@@ -6140,6 +6140,22 @@ class Shape {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].multiply(translate, translate, rotate);
         return translate;
     }
+    // p = point, b = dimensions of box
+    sdfBox(p, b) {
+        let q = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(q, q, b);
+        return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].length(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(Math.max(q[0], 0.0), Math.max(q[1], 0.0), Math.max(q[2], 0.0)))
+            + Math.min(Math.max(q[0], Math.max(q[1], q[2])), 0.0);
+    }
+    isInside(point) {
+        // make point relative to center of box
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(point, point, this.position);
+        let sdf = this.sdfBox(point, this.scale);
+        if (sdf < 0.001) {
+            return true;
+        }
+        return false;
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Shape);
 
@@ -16884,6 +16900,7 @@ class Parser {
         return Math.random() * (max - min) + min;
     }
     subdivide() {
+        this.polyLibrary.shapes = this.shapes;
         for (let i = 0; i < this.shapes.length; i++) {
             let shape = this.shapes[i];
             if (shape.symbol == "A" || shape.symbol == "C") {
@@ -17046,8 +17063,46 @@ class TransformationRule {
 class PolygonLibrary {
     constructor(dimensions) {
         this.dimensionsMap = new Map();
+        this.shapes = [];
         this.dimensionsMap = dimensions;
         this.windowDimensions = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec2 */].fromValues(1, 1);
+    }
+    intersectsSomething(currShape, p) {
+        for (let i = 0; i < this.shapes.length; i++) {
+            let shape = this.shapes[i];
+            if (shape != currShape && shape.isInside(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // center = center of object, leftEdgeDist = distance from center of left edge
+    objIntersectsSomething(currShape, center, leftEdgeDist, topEdgeDist) {
+        let topLeft = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(topLeft, center, leftEdgeDist);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(topLeft, topLeft, topEdgeDist);
+        if (this.intersectsSomething(currShape, topLeft)) {
+            return true;
+        }
+        let bottomLeft = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomLeft, center, leftEdgeDist);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomLeft, bottomLeft, topEdgeDist);
+        if (this.intersectsSomething(currShape, bottomLeft)) {
+            return true;
+        }
+        let topRight = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(topRight, center, leftEdgeDist);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(topRight, topRight, topEdgeDist);
+        if (this.intersectsSomething(currShape, topRight)) {
+            return true;
+        }
+        let bottomRight = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(bottomRight, center, leftEdgeDist);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomRight, bottomRight, topEdgeDist);
+        if (this.intersectsSomething(currShape, bottomRight)) {
+            return true;
+        }
+        return false;
     }
     subdivideWindows(shape, outSymbol) {
         let dimensions = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].clone(this.dimensionsMap.get(shape.symbol));
@@ -17065,6 +17120,9 @@ class PolygonLibrary {
             for (let j = 0; j < frontBackCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, dimensions[2] / 2.);
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(.5, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                    continue;
+                }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
@@ -17073,6 +17131,9 @@ class PolygonLibrary {
             for (let j = 0; j < frontBackCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, -dimensions[2] / 2.);
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(.5, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                    continue;
+                }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
@@ -17081,6 +17142,9 @@ class PolygonLibrary {
             for (let j = 0; j < leftRightCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, .5), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                    continue;
+                }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
@@ -17089,6 +17153,9 @@ class PolygonLibrary {
             for (let j = 0; j < leftRightCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, .5), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                    continue;
+                }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
@@ -17102,7 +17169,7 @@ class PolygonLibrary {
 /* 74 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\nin vec4 vs_transform_col0;\nin vec4 vs_transform_col1;\nin vec4 vs_transform_col2;\nin vec4 vs_transform_col3;\nin vec3 vs_Scale;\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    // fs_Pos = vs_Pos;\n    fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vec3(vs_Pos);\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 scale = mat4(vec4(.1, 0, 0, 0), vec4(0, .1, 0, 0), vec4(0, 0, .1, 0), vec4(0, -4.2, 0, 1));\n    mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);\n    vec4 pos = vs_Pos;\n    pos = transform * vec4(vec3(pos), 1);\n    fs_Pos = pos;\n    gl_Position = u_ViewProj * pos;\n}\n"
+module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\nin vec4 vs_transform_col0;\nin vec4 vs_transform_col1;\nin vec4 vs_transform_col2;\nin vec4 vs_transform_col3;\nin vec3 vs_Scale;\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    // fs_Pos = vs_Pos;\n    //fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vec3(vs_Pos);\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 scale = mat4(vec4(.1, 0, 0, 0), vec4(0, .1, 0, 0), vec4(0, 0, .1, 0), vec4(0, -4.2, 0, 1));\n    mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);\n    vec4 pos = vs_Pos;\n    pos = transform * vec4(vec3(pos), 1);\n    fs_Pos = pos;\n    fs_Nor = transform * vs_Nor;\n    gl_Position = u_ViewProj * pos;\n}\n"
 
 /***/ }),
 /* 75 */
