@@ -25,7 +25,7 @@ void main()
 {
     fs_Col = vs_Col;
     // fs_Pos = vs_Pos;
-    fs_Nor = vs_Nor;
+    //fs_Nor = vs_Nor;
 
     vec3 offset = vs_Translate;
     // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;
@@ -37,5 +37,6 @@ void main()
     vec4 pos = vs_Pos;
     pos = transform * vec4(vec3(pos), 1);
     fs_Pos = pos;
+    fs_Nor = transform * vs_Nor;
     gl_Position = u_ViewProj * pos;
 }

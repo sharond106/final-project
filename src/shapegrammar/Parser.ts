@@ -95,6 +95,7 @@ class Parser {
   }
 
   subdivide() {
+    this.polyLibrary.shapes = this.shapes;
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
       if (shape.symbol == "A" || shape.symbol == "C")  {
