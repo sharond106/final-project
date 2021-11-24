@@ -46,13 +46,6 @@ Week 3:
 - David: Bug fixes, polygon library, subdivision
 - Sharon: Bug fixes, polygon library, cut out
 
-# Samples
-![](images/house1.PNG)
-
-![](images/house2.PNG) 
-
-![](images/hosue3.PNG)
-
 # Milestone 2
 Implemented
 - Modeled geometry to use: 3 different sizes of cubes, 1 window + shutters
@@ -69,4 +62,8 @@ Future plans
 - Create scene/background for building
 
 Example generations
+![](images/house1.PNG)
 
+![](images/house2.PNG) 
+
+![](images/hosue3.PNG)
