@@ -54,9 +54,9 @@ class Mesh extends Drawable {
     this.positions = new Float32Array(posTemp);
     this.uvs = new Float32Array(uvsTemp);
 
-    console.log("indicies " + this.indices.length);
-    console.log("normals " + this.normals.length);
-    console.log("positions " + this.positions.length);
+    // console.log("indicies " + this.indices.length);
+    // console.log("normals " + this.normals.length);
+    // console.log("positions " + this.positions.length);
 
     this.generateIdx();
     this.generatePos();

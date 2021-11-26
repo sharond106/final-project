@@ -16,7 +16,7 @@ class Parser {
   polyLibrary: PolygonLibrary;
 
   constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, window1: Mesh) {
-    this.iterations = 2;
+    this.iterations = 3;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
@@ -98,8 +98,9 @@ class Parser {
     this.polyLibrary.shapes = this.shapes;
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
-      if (shape.symbol == "A" || shape.symbol == "C")  {
-        this.shapes = this.shapes.concat(this.polyLibrary.subdivideWindows(shape, "W"));
+      if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C")  {
+        let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
+        this.shapes = this.shapes.concat(outShapes);
       }
     }
   }
@@ -144,14 +145,12 @@ class Parser {
   }
 
   draw() {
-    let allShapes: Shape[] = this.shapes.concat(this.terminalShapes);
-    console.log("allshapes" + allShapes.length);
     this.drawableMap.forEach((value: Mesh, key: string) => {
       let keyShapes: Shape[] = [];
       //Gets all shape instances associated with that symbol
-      for (let i = 0; i < allShapes.length; i++) {
-        if (allShapes[i].symbol == key) {
-          keyShapes.push(allShapes[i]);
+      for (let i = 0; i < this.shapes.length; i++) {
+        if (this.shapes[i].symbol == key) {
+          keyShapes.push(this.shapes[i]);
         }
       }
       console.log("num for " + key + ", " + keyShapes.length)
@@ -163,9 +162,10 @@ class Parser {
     this.initShapes();
     this.initRules();
     this.expand(); 
+    this.shapes = this.shapes.concat(this.terminalShapes);
     this.subdivide();
     for (let i = 0; i <this.shapes.length; i++) {
-      console.log(this.shapes[i].symbol + " " + this.shapes[i].position);
+      console.log(this.shapes[i].symbol + " " + this.shapes[i].position + " " + this.shapes[i].scale);
     }
     this.draw();
   }

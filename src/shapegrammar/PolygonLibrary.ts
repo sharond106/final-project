@@ -11,10 +11,24 @@ class PolygonLibrary {
     this.windowDimensions = vec2.fromValues(1, 1);
   }
 
+  getShapeDimensions(shape: Shape): vec3 {
+    let dimensions = vec3.clone(this.dimensionsMap.get(shape.symbol));
+    dimensions[0] *= shape.scale[0];
+    dimensions[1] *= shape.scale[1];
+    dimensions[2] *= shape.scale[2];
+    return dimensions;
+  }
+
   intersectsSomething(currShape: Shape, p: vec3): boolean {
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
-      if (shape != currShape && shape.isInside(p)) {
+      let relativeP: vec3 = vec3.fromValues(0, 0, 0);
+      // Get p relative to shape's center (shape's position is center of bottom)
+      let dimensions: vec3 = this.getShapeDimensions(shape);
+      vec3.subtract(relativeP, p, shape.position);
+      relativeP[1] -= dimensions[1] / 2.;
+      vec3.divide(dimensions, dimensions, vec3.fromValues(2, 2, 2));
+      if (shape != currShape && shape.isInside(relativeP, dimensions)) {
         return true;
       }
     }
@@ -51,16 +65,15 @@ class PolygonLibrary {
   }
 
   subdivideWindows(shape: Shape, outSymbol: string) : Shape[] {
-    let dimensions = vec3.clone(this.dimensionsMap.get(shape.symbol));
-    dimensions[0] *= Math.floor(shape.scale[0]);
-    dimensions[1] *= Math.floor(shape.scale[1]);
-    dimensions[2] *= Math.floor(shape.scale[2]);
+    let dimensions = this.getShapeDimensions(shape);
+
     // how many rows of windows we want on each face
-    let rows = dimensions[1];
+    let rows = Math.floor(dimensions[1]);
     // how many cols of windows we want on front/back faces and left/right faces
-    let frontBackCols = dimensions[0];
-    let leftRightCols = dimensions[2];
+    let frontBackCols = Math.floor(dimensions[0]);
+    let leftRightCols = Math.floor(dimensions[2]);
     let outShapes: Shape[] = [];
+    // console.log("subdividing " + shape.symbol + " at " + shape.position + " scale " + shape.scale + " r" + rows + " c" + frontBackCols + " " + leftRightCols)
     
     //front wall
     for (let i = 0; i < rows; i++) {

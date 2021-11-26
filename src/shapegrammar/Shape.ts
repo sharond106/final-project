@@ -110,7 +110,7 @@ class Shape {
     return translate;
   }
 
-  // p = point, b = dimensions of box
+  // p = point, b = dimensions of box EDIT: B IS HALF THE DIMENSIONS OF THE BOX
   sdfBox(p: vec3, b: vec3) : number {
     let q: vec3 = vec3.fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
     vec3.subtract(q, q, b);
@@ -118,11 +118,9 @@ class Shape {
     + Math.min(Math.max(q[0],Math.max(q[1],q[2])),0.0);
   }
 
-  isInside(point: vec3): boolean {
-    // make point relative to center of box
-    vec3.subtract(point, point, this.position);
-    let sdf = this.sdfBox(point, this.scale);
-    if (sdf < 0.001) {
+  isInside(point: vec3, dimensions: vec3): boolean {
+    let sdf = this.sdfBox(point, dimensions);
+    if (sdf < 0.0) {
       return true;
     }
     return false;
