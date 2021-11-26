@@ -6140,18 +6140,16 @@ class Shape {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].multiply(translate, translate, rotate);
         return translate;
     }
-    // p = point, b = dimensions of box
+    // p = point, b = dimensions of box EDIT: B IS HALF THE DIMENSIONS OF THE BOX
     sdfBox(p, b) {
         let q = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(q, q, b);
         return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].length(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(Math.max(q[0], 0.0), Math.max(q[1], 0.0), Math.max(q[2], 0.0)))
             + Math.min(Math.max(q[0], Math.max(q[1], q[2])), 0.0);
     }
-    isInside(point) {
-        // make point relative to center of box
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(point, point, this.position);
-        let sdf = this.sdfBox(point, this.scale);
-        if (sdf < 0.001) {
+    isInside(point, dimensions) {
+        let sdf = this.sdfBox(point, dimensions);
+        if (sdf < 0.0) {
             return true;
         }
         return false;
@@ -16744,9 +16742,9 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
         this.normals = new Float32Array(norTemp);
         this.positions = new Float32Array(posTemp);
         this.uvs = new Float32Array(uvsTemp);
-        console.log("indicies " + this.indices.length);
-        console.log("normals " + this.normals.length);
-        console.log("positions " + this.positions.length);
+        // console.log("indicies " + this.indices.length);
+        // console.log("normals " + this.normals.length);
+        // console.log("positions " + this.positions.length);
         this.generateIdx();
         this.generatePos();
         this.generateNor();
@@ -16833,7 +16831,7 @@ class Parser {
         this.grammarRules = new Map();
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
-        this.iterations = 2;
+        this.iterations = 3;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
@@ -16903,8 +16901,9 @@ class Parser {
         this.polyLibrary.shapes = this.shapes;
         for (let i = 0; i < this.shapes.length; i++) {
             let shape = this.shapes[i];
-            if (shape.symbol == "A" || shape.symbol == "C") {
-                this.shapes = this.shapes.concat(this.polyLibrary.subdivideWindows(shape, "W"));
+            if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C") {
+                let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
+                this.shapes = this.shapes.concat(outShapes);
             }
         }
     }
@@ -16946,14 +16945,12 @@ class Parser {
         mesh.setRotateVBOs(transformCol0, transformCol1, transformCol2, transformCol3);
     }
     draw() {
-        let allShapes = this.shapes.concat(this.terminalShapes);
-        console.log("allshapes" + allShapes.length);
         this.drawableMap.forEach((value, key) => {
             let keyShapes = [];
             //Gets all shape instances associated with that symbol
-            for (let i = 0; i < allShapes.length; i++) {
-                if (allShapes[i].symbol == key) {
-                    keyShapes.push(allShapes[i]);
+            for (let i = 0; i < this.shapes.length; i++) {
+                if (this.shapes[i].symbol == key) {
+                    keyShapes.push(this.shapes[i]);
                 }
             }
             console.log("num for " + key + ", " + keyShapes.length);
@@ -16964,9 +16961,10 @@ class Parser {
         this.initShapes();
         this.initRules();
         this.expand();
+        this.shapes = this.shapes.concat(this.terminalShapes);
         this.subdivide();
         for (let i = 0; i < this.shapes.length; i++) {
-            console.log(this.shapes[i].symbol + " " + this.shapes[i].position);
+            console.log(this.shapes[i].symbol + " " + this.shapes[i].position + " " + this.shapes[i].scale);
         }
         this.draw();
     }
@@ -17067,10 +17065,23 @@ class PolygonLibrary {
         this.dimensionsMap = dimensions;
         this.windowDimensions = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec2 */].fromValues(1, 1);
     }
+    getShapeDimensions(shape) {
+        let dimensions = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].clone(this.dimensionsMap.get(shape.symbol));
+        dimensions[0] *= shape.scale[0];
+        dimensions[1] *= shape.scale[1];
+        dimensions[2] *= shape.scale[2];
+        return dimensions;
+    }
     intersectsSomething(currShape, p) {
         for (let i = 0; i < this.shapes.length; i++) {
             let shape = this.shapes[i];
-            if (shape != currShape && shape.isInside(p)) {
+            let relativeP = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
+            // Get p relative to shape's center (shape's position is center of bottom)
+            let dimensions = this.getShapeDimensions(shape);
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(relativeP, p, shape.position);
+            relativeP[1] -= dimensions[1] / 2.;
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].divide(dimensions, dimensions, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
+            if (shape != currShape && shape.isInside(relativeP, dimensions)) {
                 return true;
             }
         }
@@ -17105,16 +17116,14 @@ class PolygonLibrary {
         return false;
     }
     subdivideWindows(shape, outSymbol) {
-        let dimensions = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].clone(this.dimensionsMap.get(shape.symbol));
-        dimensions[0] *= Math.floor(shape.scale[0]);
-        dimensions[1] *= Math.floor(shape.scale[1]);
-        dimensions[2] *= Math.floor(shape.scale[2]);
+        let dimensions = this.getShapeDimensions(shape);
         // how many rows of windows we want on each face
-        let rows = dimensions[1];
+        let rows = Math.floor(dimensions[1]);
         // how many cols of windows we want on front/back faces and left/right faces
-        let frontBackCols = dimensions[0];
-        let leftRightCols = dimensions[2];
+        let frontBackCols = Math.floor(dimensions[0]);
+        let leftRightCols = Math.floor(dimensions[2]);
         let outShapes = [];
+        // console.log("subdividing " + shape.symbol + " at " + shape.position + " scale " + shape.scale + " r" + rows + " c" + frontBackCols + " " + leftRightCols)
         //front wall
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < frontBackCols; j++) {
