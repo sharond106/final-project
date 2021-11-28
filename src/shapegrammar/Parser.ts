@@ -13,9 +13,10 @@ class Parser {
   grammarRules: Map<string, GrammarRule[]> = new Map();
   drawableMap: Map<string, Mesh> = new Map();
   dimensionsMap: Map<string, vec3> = new Map();
+  colorsMap: Map<string, vec3> = new Map();
   polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, window1: Mesh) {
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, window1: Mesh, door: Mesh) {
     this.iterations = 3;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
@@ -27,8 +28,19 @@ class Parser {
     this.dimensionsMap.set('D', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('W', window1);
     this.dimensionsMap.set('W', vec3.fromValues(1, 1, 1));
-
+    this.drawableMap.set('Y', door);
+    this.dimensionsMap.set('Y', vec3.fromValues(1, 1, 1));
+    this.setColorMap()
     this.polyLibrary = new PolygonLibrary(this.dimensionsMap);
+  }
+
+  setColorMap() {
+    this.colorsMap.set('A',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('B',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('C',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('D',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('W',vec3.fromValues(34/255, 180/255, 199/255)); 
+    this.colorsMap.set('Y',vec3.fromValues(34/255, 180/255, 199/255)); 
   }
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
@@ -103,6 +115,18 @@ class Parser {
         this.shapes = this.shapes.concat(outShapes);
       }
     }
+
+    //Makes one door
+    let bottomWindows: Shape[] = [];
+    for (let i = 0; i < this.shapes.length; i++) {
+      let shape = this.shapes[i];
+      if (shape.symbol == "W" && shape.position[1] == 0) {
+        bottomWindows.push(shape);
+      }
+    }
+    if (bottomWindows.length != 0) {
+      bottomWindows[Math.floor(Math.random() * bottomWindows.length)].symbol = "Y";
+    }
   }
   
   //Draws all Shapes with given Mesh
@@ -114,9 +138,10 @@ class Parser {
     let colorsArray = [];
     let n = 1;
     for (let i = 0; i < slist.length; i++) {
-      colorsArray.push(.8);
-      colorsArray.push(.8);
-      colorsArray.push(.8);
+      let color: vec3 = this.colorsMap.get(slist[i].symbol);
+      colorsArray.push(color[0]);
+      colorsArray.push(color[1]);
+      colorsArray.push(color[2]);
       colorsArray.push(1.);
 
       let mat: mat4 = slist[i].getMatrix();
