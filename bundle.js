@@ -6192,6 +6192,7 @@ let box2;
 let box3;
 let box4;
 let window1;
+let door1;
 let screenQuad;
 let time = 0.0;
 let prevAngle = 3.0;
@@ -6242,9 +6243,12 @@ function main() {
     let obj4 = readTextFile('./Meshes/window1.obj');
     window1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj4, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     window1.create();
+    let obj5 = readTextFile('./Meshes/door.obj');
+    door1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj5, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
+    door1.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, window1);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, window1, door1);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6270,7 +6274,7 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad], color.color);
         renderer.render(camera, instancedShader, [
-            box1, box2, box3, box4, window1
+            box1, box2, box3, box4, window1, door1
         ], color.color);
         // stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
@@ -16824,13 +16828,14 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(box1, box2, box3, box4, window1) {
+    constructor(box1, box2, box3, box4, window1, door) {
         this.shapes = [];
         this.terminalShapes = [];
         this.terminalMap = new Map();
         this.grammarRules = new Map();
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
+        this.colorsMap = new Map();
         this.iterations = 3;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
@@ -16842,7 +16847,18 @@ class Parser {
         this.dimensionsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('W', window1);
         this.dimensionsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.drawableMap.set('Y', door);
+        this.dimensionsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.setColorMap();
         this.polyLibrary = new __WEBPACK_IMPORTED_MODULE_4__PolygonLibrary__["a" /* default */](this.dimensionsMap);
+    }
+    setColorMap() {
+        this.colorsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('B', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('C', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 180 / 255, 199 / 255));
+        this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 180 / 255, 199 / 255));
     }
     // Initialize this.shapes, this.terminalShapes, this.terminalMap
     initShapes() {
@@ -16906,6 +16922,17 @@ class Parser {
                 this.shapes = this.shapes.concat(outShapes);
             }
         }
+        //Makes one door
+        let bottomWindows = [];
+        for (let i = 0; i < this.shapes.length; i++) {
+            let shape = this.shapes[i];
+            if (shape.symbol == "W" && shape.position[1] == 0) {
+                bottomWindows.push(shape);
+            }
+        }
+        if (bottomWindows.length != 0) {
+            bottomWindows[Math.floor(Math.random() * bottomWindows.length)].symbol = "Y";
+        }
     }
     //Draws all Shapes with given Mesh
     drawMesh(slist, mesh) {
@@ -16916,9 +16943,10 @@ class Parser {
         let colorsArray = [];
         let n = 1;
         for (let i = 0; i < slist.length; i++) {
-            colorsArray.push(.8);
-            colorsArray.push(.8);
-            colorsArray.push(.8);
+            let color = this.colorsMap.get(slist[i].symbol);
+            colorsArray.push(color[0]);
+            colorsArray.push(color[1]);
+            colorsArray.push(color[2]);
             colorsArray.push(1.);
             let mat = slist[i].getMatrix();
             for (let i = 0; i < 4; i++) {
