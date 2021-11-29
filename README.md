@@ -53,13 +53,6 @@ Implemented
 - Implemented shape grammar parser with instanced rendering for each of the meshes
 - Started implementing polygon library and able to draw windows on top of a wall. Depending on the scale of the wall, multiple rows/cols of windows will be generated
 
-# Milestone 3
-Implemented
-- Intersection detector to better determine when to add windows
-- Door mesh and new window mesh modeled
-- Option to set color of different shapes added
-- Grammar rules improved to yield more interesting buildings.
-
 Future plans
 - Implement a way to handle intersections between windows and cubes
 - Possibly change the grammar rules
@@ -74,6 +67,19 @@ Example generations
 ![](images/house2.PNG) 
 
 ![](images/hosue3.PNG)
+
+# Milestone 3
+Implemented
+- Intersection detector to better determine when to add windows: To do this, we came up with an algorithm that uses the idea of SDFs from ray marching. After splitting a wall into possible window locations, we test the 4 corners of the window to see if it lies within any other shapes. Although this requires iterating through every shape, there are not that many shapes in our final building. After solving many tedious bugs, this method is still not working all the time, but we are trying to figure out why! 
+- Door mesh and new window mesh modeled: We place all the windows first, and then we randomly select a window on the first floor and replace it with a door. 
+- Option to set color of different shapes added
+- Grammar rules improved to yield more interesting buildings
+
+Future plans
+- Fix intersection testing bugs
+- Possibly improve the grammar rules
+- Add texturing
+- Create scene/background for building
 
 Example generations 2
 ![](images/house4.PNG)
