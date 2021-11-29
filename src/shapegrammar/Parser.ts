@@ -16,7 +16,7 @@ class Parser {
   colorsMap: Map<string, vec3> = new Map();
   polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, window1: Mesh, door: Mesh) {
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh) {
     this.iterations = 3;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
@@ -26,6 +26,10 @@ class Parser {
     this.dimensionsMap.set('C', vec3.fromValues(2, 2, 2));
     this.drawableMap.set('D', box4);
     this.dimensionsMap.set('D', vec3.fromValues(1, 1, 1));
+    this.drawableMap.set('E', box5);
+    this.dimensionsMap.set('E', vec3.fromValues(1, 1, 1));
+    this.drawableMap.set('F', box6);
+    this.dimensionsMap.set('F', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('W', window1);
     this.dimensionsMap.set('W', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('Y', door);
@@ -39,6 +43,8 @@ class Parser {
     this.colorsMap.set('B',vec3.fromValues(.8, .8, .8)); 
     this.colorsMap.set('C',vec3.fromValues(.8, .8, .8)); 
     this.colorsMap.set('D',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('E',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('F',vec3.fromValues(.8, .8, .8)); 
     this.colorsMap.set('W',vec3.fromValues(34/255, 180/255, 199/255)); 
     this.colorsMap.set('Y',vec3.fromValues(34/255, 180/255, 199/255)); 
   }
@@ -47,6 +53,8 @@ class Parser {
   initShapes() {
     this.shapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
     this.terminalMap.set("D", true);
+    this.terminalMap.set("E", true);
+    this.terminalMap.set("F", true);
     this.terminalMap.set("W", true);
   }
 
@@ -75,10 +83,12 @@ class Parser {
   initRules() {
     this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
     this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
+    this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5]));
     this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]));
     this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
     this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
-    this.initEntry("C", this.initRule(["C"], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1]));
   }
 
   // Expands this.shapes and this.terminalShapes for this.iterations
@@ -93,7 +103,10 @@ class Parser {
           continue;
         }
         // Get the symbol's successors and save them until next iteration
+        
         let rules: GrammarRule[] = this.grammarRules.get(currShape.symbol);
+        console.log(currShape.symbol);
+        console.log(rules);
         let rule: GrammarRule = rules[Math.floor(Math.random() * rules.length)];
         let successors: Shape[] = rule.expand(currShape);
         newShapes = newShapes.concat(successors);

@@ -17,10 +17,62 @@ float random1( vec3 p ) {
   18.5453);
 }
 
+float smootherStep(float a, float b, float t) {
+    t = t*t*t*(t*(t*6.0 - 15.0) + 10.0);
+    return mix(a, b, t);
+}
+
+float interpNoise3D(float x, float y, float z) {
+  x *= 2.;
+  y *= 2.;
+  z *= 2.;
+  float intX = floor(x);
+  float fractX = fract(x);
+  float intY = floor(y);
+  float fractY = fract(y);
+  float intZ = floor(z);
+  float fractZ = fract(z);
+  float v1 = random1(vec3(intX, intY, intZ));
+  float v2 = random1(vec3(intX + 1., intY, intZ));
+  float v3 = random1(vec3(intX, intY + 1., intZ));
+  float v4 = random1(vec3(intX + 1., intY + 1., intZ));
+
+  float v5 = random1(vec3(intX, intY, intZ + 1.));
+  float v6 = random1(vec3(intX + 1., intY, intZ + 1.));
+  float v7 = random1(vec3(intX, intY + 1., intZ + 1.));
+  float v8 = random1(vec3(intX + 1., intY + 1., intZ + 1.));
+
+  float i1 = smootherStep(v1, v2, fractX);
+  float i2 = smootherStep(v3, v4, fractX);
+  float result1 = smootherStep(i1, i2, fractY);
+  float i3 = smootherStep(v5, v6, fractX);
+  float i4 = smootherStep(v7, v8, fractX);
+  float result2 = smootherStep(i3, i4, fractY);
+  return smootherStep(result1, result2, fractZ);
+}
+
+float fbm(float x, float y, float z) {
+  float total = 0.;
+  float persistence = 0.5f;
+  for(float i = 1.; i <= 6.; i++) {
+    float freq = pow(2., i);
+    float amp = pow(persistence, i);
+    total += interpNoise3D(x * freq, y * freq, z * freq) * amp;
+  }
+  return total;
+}
+
+float noiseTable(vec3 p) {
+  float f = fbm(p.x, p.y, p.z);
+  vec4 pos = fs_Nor + -1.;
+  pos += f; 
+  return fbm(pos.x, pos.y, pos.z);
+}
+
 void main()
 {
     vec4 lightPos = vec4(0, 30, 30, 1);
-    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));
+    float diffuseTerm = dot(normalize(vec4(noiseTable(vec3(fs_Pos)))), normalize(lightPos - fs_Pos));
     // Avoid negative lighting values
     diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);
     float ambientTerm = 0.2;
