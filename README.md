@@ -78,6 +78,6 @@ Example generations
 Example generations 2
 ![](images/house4.PNG)
 
-![](images/house4.PNG) 
+![](images/house5.PNG) 
 
 ![](images/house6.PNG)
