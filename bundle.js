@@ -6140,7 +6140,7 @@ class Shape {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* mat4 */].multiply(translate, translate, rotate);
         return translate;
     }
-    // p = point, b = dimensions of box EDIT: B IS HALF THE DIMENSIONS OF THE BOX
+    // p = point, b = dimensions of box
     sdfBox(p, b) {
         let q = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(q, q, b);
@@ -17153,11 +17153,12 @@ class PolygonLibrary {
         let outShapes = [];
         // console.log("subdividing " + shape.symbol + " at " + shape.position + " scale " + shape.scale + " r" + rows + " c" + frontBackCols + " " + leftRightCols)
         //front wall
+        let unifNum = .4;
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < frontBackCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, dimensions[2] / 2.);
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(.5, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(unifNum, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
@@ -17168,7 +17169,7 @@ class PolygonLibrary {
             for (let j = 0; j < frontBackCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, -dimensions[2] / 2.);
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(.5, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(unifNum, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
@@ -17179,7 +17180,7 @@ class PolygonLibrary {
             for (let j = 0; j < leftRightCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, .5), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, unifNum), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
@@ -17190,7 +17191,7 @@ class PolygonLibrary {
             for (let j = 0; j < leftRightCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + .5, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, .5), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, .5, 0))) {
+                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, unifNum), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
@@ -17212,7 +17213,7 @@ module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_T
 /* 75 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_Time;\nuniform vec3 u_Color;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nfloat random1( vec3 p ) {\n  return fract(sin((dot(p, vec3(127.1,\n  311.7,\n  191.999)))) *\n  18.5453);\n}\n\nvoid main()\n{\n    vec4 lightPos = vec4(0, 30, 30, 1);\n    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));\n    // Avoid negative lighting values\n    diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);\n    float ambientTerm = 0.2;\n    float lightIntensity = diffuseTerm + ambientTerm;\n    // If this fragment is a light, flicker it\n    vec3 col = fs_Col.rgb;\n    if (fs_Col[3] < 1.) {\n        float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));\n        col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);\n    }\n    out_Col = vec4(col * lightIntensity, fs_Col[3]);\n    // out_Col = vec4(fs_Nor.rgb, 1);\n    // out_Col = vec4(1);\n}\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_Time;\nuniform vec3 u_Color;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nfloat random1( vec3 p ) {\n  return fract(sin((dot(p, vec3(127.1,\n  311.7,\n  191.999)))) *\n  18.5453);\n}\n\nvoid main()\n{\n    vec4 lightPos = vec4(0, 30, 30, 1);\n    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));\n    // Avoid negative lighting values\n    diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);\n    float ambientTerm = 0.2;\n    float lightIntensity = diffuseTerm + ambientTerm;\n    // If this fragment is a light, flicker it\n    vec3 col = fs_Col.rgb;\n    if (fs_Col[3] < 1.) {\n        float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));\n        col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);\n    }\n    out_Col = vec4(col * lightIntensity, fs_Col[3]);\n    // out_Col = vec4((fs_Pos + 3.) / 6.);\n    // out_Col = vec4(fs_Nor.rgb, 1)  ;\n    // out_Col = vec4(1);\n}\n"
 
 /***/ }),
 /* 76 */
