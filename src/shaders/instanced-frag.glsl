@@ -72,7 +72,8 @@ float noiseTable(vec3 p) {
 void main()
 {
     vec4 lightPos = vec4(0, 30, 30, 1);
-    float diffuseTerm = dot(normalize(vec4(noiseTable(vec3(fs_Pos)))), normalize(lightPos - fs_Pos));
+    //float diffuseTerm = dot(normalize(vec4(noiseTable(vec3(fs_Pos)))), normalize(lightPos - fs_Pos));
+    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));
     // Avoid negative lighting values
     diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);
     float ambientTerm = 0.2;
