@@ -17,7 +17,7 @@ class Parser {
   polyLibrary: PolygonLibrary;
 
   constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh) {
-    this.iterations = 3;
+    this.iterations = 2;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
@@ -56,6 +56,7 @@ class Parser {
     this.terminalMap.set("E", true);
     this.terminalMap.set("F", true);
     this.terminalMap.set("W", true);
+    this.terminalMap.set("B", true);
   }
 
   initRule(nextSymbols: string[], 
@@ -81,13 +82,13 @@ class Parser {
 
   // Initialize this.grammarRules
   initRules() {
-    this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
+    //this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    //this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
     this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5]));
-    this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]));
-    this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
+    //this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    //this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]));
+    // this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+    //this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
     this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1]));
   }
 
@@ -105,8 +106,8 @@ class Parser {
         // Get the symbol's successors and save them until next iteration
         
         let rules: GrammarRule[] = this.grammarRules.get(currShape.symbol);
-        console.log(currShape.symbol);
-        console.log(rules);
+        // console.log(currShape.symbol);
+        // console.log(rules);
         let rule: GrammarRule = rules[Math.floor(Math.random() * rules.length)];
         let successors: Shape[] = rule.expand(currShape);
         newShapes = newShapes.concat(successors);
@@ -123,23 +124,24 @@ class Parser {
     this.polyLibrary.shapes = this.shapes;
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
-      if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C")  {
+      if (shape.symbol == "B")  {
+      // if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C")  {
         let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
         this.shapes = this.shapes.concat(outShapes);
       }
     }
 
     //Makes one door
-    let bottomWindows: Shape[] = [];
-    for (let i = 0; i < this.shapes.length; i++) {
-      let shape = this.shapes[i];
-      if (shape.symbol == "W" && shape.position[1] == 0) {
-        bottomWindows.push(shape);
-      }
-    }
-    if (bottomWindows.length != 0) {
-      bottomWindows[Math.floor(Math.random() * bottomWindows.length)].symbol = "Y";
-    }
+    // let bottomWindows: Shape[] = [];
+    // for (let i = 0; i < this.shapes.length; i++) {
+    //   let shape = this.shapes[i];
+    //   if (shape.symbol == "W" && shape.position[1] == 0) {
+    //     bottomWindows.push(shape);
+    //   }
+    // }
+    // if (bottomWindows.length != 0) {
+    //   bottomWindows[Math.floor(Math.random() * bottomWindows.length)].symbol = "Y";
+    // }
   }
   
   //Draws all Shapes with given Mesh
