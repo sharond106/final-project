@@ -74,3 +74,10 @@ Example generations
 ![](images/house2.PNG) 
 
 ![](images/hosue3.PNG)
+
+Example generations 2
+![](images/house4.PNG)
+
+![](images/house4.PNG) 
+
+![](images/house6.PNG)
