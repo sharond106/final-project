@@ -6191,6 +6191,8 @@ let box1;
 let box2;
 let box3;
 let box4;
+let box5;
+let box6;
 let window1;
 let door1;
 let screenQuad;
@@ -6246,9 +6248,15 @@ function main() {
     let obj5 = readTextFile('./Meshes/door.obj');
     door1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj5, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     door1.create();
+    let obj6 = readTextFile('./Meshes/box2.obj');
+    box5 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj6, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
+    box5.create();
+    let obj7 = readTextFile('./Meshes/box3.obj');
+    box6 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj7, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
+    box6.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, window1, door1);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6274,7 +6282,7 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad], color.color);
         renderer.render(camera, instancedShader, [
-            box1, box2, box3, box4, window1, door1
+            box1, box2, box3, box4, box5, box6, window1, door1
         ], color.color);
         // stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
@@ -16828,7 +16836,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(box1, box2, box3, box4, window1, door) {
+    constructor(box1, box2, box3, box4, box5, box6, window1, door) {
         this.shapes = [];
         this.terminalShapes = [];
         this.terminalMap = new Map();
@@ -16845,6 +16853,10 @@ class Parser {
         this.dimensionsMap.set('C', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
         this.drawableMap.set('D', box4);
         this.dimensionsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.drawableMap.set('E', box5);
+        this.dimensionsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.drawableMap.set('F', box6);
+        this.dimensionsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('W', window1);
         this.dimensionsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('Y', door);
@@ -16857,6 +16869,8 @@ class Parser {
         this.colorsMap.set('B', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
         this.colorsMap.set('C', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
         this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
         this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 180 / 255, 199 / 255));
         this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 180 / 255, 199 / 255));
     }
@@ -16864,6 +16878,8 @@ class Parser {
     initShapes() {
         this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
         this.terminalMap.set("D", true);
+        this.terminalMap.set("E", true);
+        this.terminalMap.set("F", true);
         this.terminalMap.set("W", true);
     }
     initRule(nextSymbols, tx, ty, tz, rx, ry, rz, sx, sy, sz) {
@@ -16885,10 +16901,12 @@ class Parser {
     initRules() {
         this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
         this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
+        this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5]));
         this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+        this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]));
         this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
         this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
-        this.initEntry("C", this.initRule(["C"], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
+        this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1]));
     }
     // Expands this.shapes and this.terminalShapes for this.iterations
     expand() {
@@ -16903,6 +16921,8 @@ class Parser {
                 }
                 // Get the symbol's successors and save them until next iteration
                 let rules = this.grammarRules.get(currShape.symbol);
+                console.log(currShape.symbol);
+                console.log(rules);
                 let rule = rules[Math.floor(Math.random() * rules.length)];
                 let successors = rule.expand(currShape);
                 newShapes = newShapes.concat(successors);
@@ -17213,7 +17233,7 @@ module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_T
 /* 75 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_Time;\nuniform vec3 u_Color;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nfloat random1( vec3 p ) {\n  return fract(sin((dot(p, vec3(127.1,\n  311.7,\n  191.999)))) *\n  18.5453);\n}\n\nvoid main()\n{\n    vec4 lightPos = vec4(0, 30, 30, 1);\n    float diffuseTerm = dot(normalize(fs_Nor), normalize(lightPos - fs_Pos));\n    // Avoid negative lighting values\n    diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);\n    float ambientTerm = 0.2;\n    float lightIntensity = diffuseTerm + ambientTerm;\n    // If this fragment is a light, flicker it\n    vec3 col = fs_Col.rgb;\n    if (fs_Col[3] < 1.) {\n        float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));\n        col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);\n    }\n    out_Col = vec4(col * lightIntensity, fs_Col[3]);\n    // out_Col = vec4((fs_Pos + 3.) / 6.);\n    // out_Col = vec4(fs_Nor.rgb, 1)  ;\n    // out_Col = vec4(1);\n}\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_Time;\nuniform vec3 u_Color;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nfloat random1( vec3 p ) {\n  return fract(sin((dot(p, vec3(127.1,\n  311.7,\n  191.999)))) *\n  18.5453);\n}\n\nfloat smootherStep(float a, float b, float t) {\n    t = t*t*t*(t*(t*6.0 - 15.0) + 10.0);\n    return mix(a, b, t);\n}\n\nfloat interpNoise3D(float x, float y, float z) {\n  x *= 2.;\n  y *= 2.;\n  z *= 2.;\n  float intX = floor(x);\n  float fractX = fract(x);\n  float intY = floor(y);\n  float fractY = fract(y);\n  float intZ = floor(z);\n  float fractZ = fract(z);\n  float v1 = random1(vec3(intX, intY, intZ));\n  float v2 = random1(vec3(intX + 1., intY, intZ));\n  float v3 = random1(vec3(intX, intY + 1., intZ));\n  float v4 = random1(vec3(intX + 1., intY + 1., intZ));\n\n  float v5 = random1(vec3(intX, intY, intZ + 1.));\n  float v6 = random1(vec3(intX + 1., intY, intZ + 1.));\n  float v7 = random1(vec3(intX, intY + 1., intZ + 1.));\n  float v8 = random1(vec3(intX + 1., intY + 1., intZ + 1.));\n\n  float i1 = smootherStep(v1, v2, fractX);\n  float i2 = smootherStep(v3, v4, fractX);\n  float result1 = smootherStep(i1, i2, fractY);\n  float i3 = smootherStep(v5, v6, fractX);\n  float i4 = smootherStep(v7, v8, fractX);\n  float result2 = smootherStep(i3, i4, fractY);\n  return smootherStep(result1, result2, fractZ);\n}\n\nfloat fbm(float x, float y, float z) {\n  float total = 0.;\n  float persistence = 0.5f;\n  for(float i = 1.; i <= 6.; i++) {\n    float freq = pow(2., i);\n    float amp = pow(persistence, i);\n    total += interpNoise3D(x * freq, y * freq, z * freq) * amp;\n  }\n  return total;\n}\n\nfloat noiseTable(vec3 p) {\n  float f = fbm(p.x, p.y, p.z);\n  vec4 pos = fs_Nor + -1.;\n  pos += f; \n  return fbm(pos.x, pos.y, pos.z);\n}\n\nvoid main()\n{\n    vec4 lightPos = vec4(0, 30, 30, 1);\n    float diffuseTerm = dot(normalize(vec4(noiseTable(vec3(fs_Pos)))), normalize(lightPos - fs_Pos));\n    // Avoid negative lighting values\n    diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);\n    float ambientTerm = 0.2;\n    float lightIntensity = diffuseTerm + ambientTerm;\n    // If this fragment is a light, flicker it\n    vec3 col = fs_Col.rgb;\n    if (fs_Col[3] < 1.) {\n        float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));\n        col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);\n    }\n    out_Col = vec4(col * lightIntensity, fs_Col[3]);\n    // out_Col = vec4((fs_Pos + 3.) / 6.);\n    // out_Col = vec4(fs_Nor.rgb, 1)  ;\n    // out_Col = vec4(1);\n}\n"
 
 /***/ }),
 /* 76 */
