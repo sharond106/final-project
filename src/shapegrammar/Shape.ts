@@ -110,7 +110,7 @@ class Shape {
     return translate;
   }
 
-  // p = point, b = dimensions of box EDIT: B IS HALF THE DIMENSIONS OF THE BOX
+  // p = point, b = dimensions of box
   sdfBox(p: vec3, b: vec3) : number {
     let q: vec3 = vec3.fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
     vec3.subtract(q, q, b);
@@ -126,5 +126,4 @@ class Shape {
     return false;
   }
 }
-
 export default Shape;

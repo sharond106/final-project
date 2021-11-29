@@ -76,11 +76,12 @@ class PolygonLibrary {
     // console.log("subdividing " + shape.symbol + " at " + shape.position + " scale " + shape.scale + " r" + rows + " c" + frontBackCols + " " + leftRightCols)
     
     //front wall
+    let unifNum = .4;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < frontBackCols; j++) {
         let pos = vec3.fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, dimensions[2] / 2.);
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + .5, pos[2]), vec3.fromValues(.5, 0, 0), vec3.fromValues(0, .5, 0))) {
+        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2]), vec3.fromValues(unifNum, 0, 0), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
@@ -91,7 +92,7 @@ class PolygonLibrary {
       for (let j = 0; j < frontBackCols; j++) {
         let pos = vec3.fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, -dimensions[2] / 2.);
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + .5, pos[2]), vec3.fromValues(.5, 0, 0), vec3.fromValues(0, .5, 0))) {
+        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2]), vec3.fromValues(unifNum, 0, 0), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(0, 0, -1), vec3.fromValues(-1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
@@ -102,7 +103,7 @@ class PolygonLibrary {
       for (let j = 0; j < leftRightCols; j++) {
         let pos = vec3.fromValues(-dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + .5, pos[2]), vec3.fromValues(0, 0, .5), vec3.fromValues(0, .5, 0))) {
+        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2]), vec3.fromValues(0, 0, unifNum), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(-1, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
@@ -113,7 +114,7 @@ class PolygonLibrary {
       for (let j = 0; j < leftRightCols; j++) {
         let pos = vec3.fromValues(dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + .5, pos[2]), vec3.fromValues(0, 0, .5), vec3.fromValues(0, .5, 0))) {
+        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2]), vec3.fromValues(0, 0, unifNum), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(1, 0, 0), vec3.fromValues(0, 0, -1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));

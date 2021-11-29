@@ -32,6 +32,7 @@ void main()
         col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);
     }
     out_Col = vec4(col * lightIntensity, fs_Col[3]);
-    // out_Col = vec4(fs_Nor.rgb, 1);
+    // out_Col = vec4((fs_Pos + 3.) / 6.);
+    // out_Col = vec4(fs_Nor.rgb, 1)  ;
     // out_Col = vec4(1);
 }
