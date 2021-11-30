@@ -18,6 +18,11 @@ float noise1D2(float p) {
   126548.98712);
 }
 
+float noise2D( vec2 p ) {
+  return fract(sin(dot(p, vec2(127.1, 311.7)))
+  * 43758.5453);
+}
+
 float interpNoise1D(float x, bool version1) {
   float intX = floor(x);
   float fractX = fract(x);
@@ -37,7 +42,7 @@ float interpNoise1D(float x, bool version1) {
 float fbm(float x, bool version1) {
   float total = 0.;
   float persistence = 0.5f;
-  float octaves = 8.;
+  float octaves = 6.;
   for(float i = 1.; i <= octaves; i++) {
     float freq = pow(2.f, i);
     float amp = pow(persistence, i);
@@ -49,6 +54,34 @@ float fbm(float x, bool version1) {
   }
   return total;
 } 
+
+float interpNoise2D(float x, float y) {
+  float intX = floor(x);
+  float fractX = fract(x);
+  float intY = floor(y);
+  float fractY = fract(y);
+  float v1 = noise2D(vec2(intX, intY));
+  float v2 = noise2D(vec2(intX + 1., intY));
+  float v3 = noise2D(vec2(intX, intY + 1.));
+  float v4 = noise2D(vec2(intX + 1., intY + 1.));
+  float i1 = mix(v1, v2, fractX);
+  float i2 = mix(v3, v4, fractX);
+  return mix(i1, i2, fractY);
+}
+
+float fbm(float x, float y) {
+  float total = 0.;
+  float persistence = 0.5f;
+  float octaves = 8.;
+  for(float i = 1.; i <= octaves; i++) {
+    float freq = pow(2.f, i);
+    float amp = pow(persistence, i);
+    total += interpNoise2D(x * freq,
+    y * freq) * amp;
+  }
+  return total;
+}
+
 
 vec2 random2( vec2 p ) {
   return fract(sin(vec2(dot(p, vec2(127.1, 311.7)),
@@ -77,23 +110,38 @@ float GetBias(float time, float bias) {
   return (time / ((((1.0/bias) - 2.0)*(1.0 - time))+1.0));
 }
 
+vec3 backgroundColor(vec2 pos) {
+  vec3 topSkyColor = vec3(0, 0.46, 0.81);
+  vec3 bottomSkyColor = vec3(0.47, 0.7, 0.88);
+  vec3 mountainColor = vec3(0.45, 0.38, 0.29);
+  vec3 mountainColor2 = vec3(0.12, 0.21, 0.12);
+  vec3 topOceanColor = vec3(0.01, 0.15, 0.29);
+  vec3 bottomOceanColor = vec3(0.16, 0.35, 0.53);
+  vec3 col = vec3(.05, 0, .4);  
+  // horizon line
+  if (pos.y < 0.) {
+    if (pos.y < -.05) {
+      col = mix(bottomOceanColor, topOceanColor, (pos.y + 1.)/.95);
+    } else {
+      col = mix(topOceanColor, bottomSkyColor, GetBias((pos.y + .05)/.05, .8));
+    }
+  }
+  float f = fbm(pos.x - 4.2, true) / 1.7;
+  f -= .25;
+  float f2 = fbm(pos.x + 4., false) / 5.;
+  f2 -= .19;
+  // moutains
+  if (pos.y < f && pos.y > f2) {
+    col = mix(mountainColor, mountainColor2, fbm(pos.x * 35., pos.y * 35.));
+  } else if (pos.y >= 0.) {  // sky
+    col = mix(bottomSkyColor, topSkyColor, pos.y);
+    // if (pos.y > .4) {
+    //   col += vec3(1. - step(.009, WorleyNoise(vec2(pos.x, pos.y))));
+    // }
+  }
+  return col;
+}
+
 void main() {
-  float f = 0.;
-  vec3 col = vec3(.05, 0, .4);
-  f = fbm(fs_Pos.x, true);
-  f -= .5;
-  if (fs_Pos.y < f) {
-    col = vec3(0, 0, .1);
-  } else {
-    col = mix(vec3(.08, 0, .4), vec3(.0, 0, 0), fs_Pos.y);
-    if (fs_Pos.y > .4) {
-    col += vec3(1. - step(.009, WorleyNoise(vec2(fs_Pos.x, fs_Pos.y))));
-  }
-  }
-  f = fbm(fs_Pos.x / 1.5, false) / 4.;
-  f -= .4;
-  if (fs_Pos.y < f) {
-    col = mix(vec3(.9, .95, 1), vec3(.0, 0, .05), GetBias(fs_Pos.y + 1., .7));
-  }
-  out_Col = vec4(col, 1);
+  out_Col = vec4(backgroundColor(fs_Pos.xy), 1);
 }
