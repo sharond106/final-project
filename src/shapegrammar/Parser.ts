@@ -17,7 +17,7 @@ class Parser {
   polyLibrary: PolygonLibrary;
 
   constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh) {
-    this.iterations = 3;
+    this.iterations = 7;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
