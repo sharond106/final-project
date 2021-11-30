@@ -16844,7 +16844,7 @@ class Parser {
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 3;
+        this.iterations = 7;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
