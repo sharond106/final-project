@@ -60,6 +60,7 @@ Future plans
 - Add other decorative meshes
 - Add features to polygon library to be able to subdivide meshes in other ways
 - Create scene/background for building
+- Add GUI elements
 
 Example generations
 ![](images/house1.PNG)
