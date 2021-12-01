@@ -77,8 +77,10 @@ Implemented
 
 Future plans
 - Fix intersection testing bugs
-- Possibly improve the grammar rules
+- Improve the grammar rules
 - Add texturing
+- Add lighting
+- Make meshes look more Greek villa like (bevel edges)
 - Create scene/background for building
 
 Example generations 2
