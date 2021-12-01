@@ -27,9 +27,9 @@ class Parser {
     this.drawableMap.set('D', box4);
     this.dimensionsMap.set('D', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('E', box5);
-    this.dimensionsMap.set('E', vec3.fromValues(1, 1, 1));
+    this.dimensionsMap.set('E', vec3.fromValues(1.5, 1.5, 1.5));
     this.drawableMap.set('F', box6);
-    this.dimensionsMap.set('F', vec3.fromValues(1, 1, 1));
+    this.dimensionsMap.set('F', vec3.fromValues(2, 2, 2));
     this.drawableMap.set('W', window1);
     this.dimensionsMap.set('W', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('Y', door);
