@@ -83,6 +83,7 @@ Future plans
 - Add lighting
 - Make meshes look more Greek villa like (bevel edges)
 - Create scene/background for building
+- Add GUI elements
 
 Example generations 2
 ![](images/house4.PNG)
