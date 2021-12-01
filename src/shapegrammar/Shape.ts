@@ -112,15 +112,22 @@ class Shape {
 
   // p = point, b = dimensions of box
   sdfBox(p: vec3, b: vec3) : number {
-    let q: vec3 = vec3.fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
-    vec3.subtract(q, q, b);
-    return vec3.length(vec3.fromValues(Math.max(q[0],0.0), Math.max(q[1],0.0), Math.max(q[2],0.0))) 
-    + Math.min(Math.max(q[0],Math.max(q[1],q[2])),0.0);
+    // let q: vec3 = vec3.fromValues(Math.abs(p[0]), Math.abs(p[1]), Math.abs(p[2]));
+    // vec3.subtract(q, q, b);
+    // console.log("q " + q);
+    // return vec3.length(vec3.fromValues(Math.max(q[0],0.0), Math.max(q[1],0.0), Math.max(q[2],0.0))) 
+    // + Math.min(Math.max(q[0],Math.max(q[1],q[2])),0.0);
+    return 0
   }
 
   isInside(point: vec3, dimensions: vec3): boolean {
-    let sdf = this.sdfBox(point, dimensions);
-    if (sdf < 0.0) {
+  //   let sdf = this.sdfBox(point, dimensions);
+  //   if (sdf < 0.0) {
+  //     return true;
+  //   }
+  //   return false;
+    let q: vec3 = vec3.fromValues(Math.abs(point[0]), Math.abs(point[1]), Math.abs(point[2]));
+    if (dimensions[0] > q[0] && dimensions[1] > q[1] && dimensions[2] > q[2]) {
       return true;
     }
     return false;

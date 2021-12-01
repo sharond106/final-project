@@ -13,6 +13,8 @@ class PolygonLibrary {
 
   getShapeDimensions(shape: Shape): vec3 {
     let dimensions = vec3.clone(this.dimensionsMap.get(shape.symbol));
+    console.log(dimensions);
+    console.log(shape.scale)
     dimensions[0] *= shape.scale[0];
     dimensions[1] *= shape.scale[1];
     dimensions[2] *= shape.scale[2];
@@ -21,18 +23,28 @@ class PolygonLibrary {
 
   intersectsSomething(currShape: Shape, p: vec3): boolean {
     for (let i = 0; i < this.shapes.length; i++) {
+      
       let shape = this.shapes[i];
+      if (shape.symbol == "F") {
+        console.log("PROBLEM SHAPE -----------------------------")
+      } else {
+        console.log("IGNORE -----------------------------")
+      }
       console.log("testing against shape " + shape.symbol + " at " + shape.position)
+      console.log("Current position " + p);
       let relativeP: vec3 = vec3.fromValues(0, 0, 0);
       // Get p relative to shape's center (shape's position is center of bottom)
-      let dimensions: vec3 = this.getShapeDimensions(shape);
-      console.log("dimensions " + dimensions)
+      let dimensions: vec3 = this.getShapeDimensions(shape); 
       vec3.subtract(relativeP, p, shape.position);
       relativeP[1] -= dimensions[1] / 2.;
       vec3.divide(dimensions, dimensions, vec3.fromValues(2, 2, 2));
-
-      if (shape.isInside(relativeP, dimensions)) {
+      console.log("dimensions " + dimensions);
+      console.log("relative P " + relativeP);
+      let res = shape.isInside(relativeP, dimensions);
+      console.log("-------------------------------------------")
+      if (res) {
       // if (shape != currShape && shape.isInside(relativeP, dimensions)) {
+        console.log("Is Inside");
         return true;
       }
     }
@@ -41,6 +53,7 @@ class PolygonLibrary {
 
   // center = center of object, leftEdgeDist = distance from center of left edge
   objIntersectsSomething(currShape: Shape, center: vec3, leftEdgeDist: vec3, topEdgeDist: vec3): boolean {
+    
     console.log("testing if obj intersects at " + center)
     let topLeft: vec3 = vec3.fromValues(0, 0, 0);
     vec3.subtract(topLeft, center, leftEdgeDist);

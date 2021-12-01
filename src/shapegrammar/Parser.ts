@@ -27,9 +27,9 @@ class Parser {
     this.drawableMap.set('D', box4);
     this.dimensionsMap.set('D', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('E', box5);
-    this.dimensionsMap.set('E', vec3.fromValues(1, 1, 1));
+    this.dimensionsMap.set('E', vec3.fromValues(1.5, 1.5, 1.5));
     this.drawableMap.set('F', box6);
-    this.dimensionsMap.set('F', vec3.fromValues(1, 1, 1));
+    this.dimensionsMap.set('F', vec3.fromValues(2, 2, 2));
     this.drawableMap.set('W', window1);
     this.dimensionsMap.set('W', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('Y', door);
@@ -95,6 +95,7 @@ class Parser {
   // Expands this.shapes and this.terminalShapes for this.iterations
   expand() {
     for (let i = 0; i < this.iterations; i++) {
+      console.log("At iteration: " + i);
       let newShapes: Shape[] = [];
       for (let j = 0; j < this.shapes.length; j++) {
         let currShape: Shape = this.shapes[j];
@@ -121,6 +122,7 @@ class Parser {
   }
 
   subdivide() {
+    console.log("these are the shapes!!! " + this.shapes);
     this.polyLibrary.shapes = this.shapes;
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
