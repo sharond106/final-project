@@ -16854,9 +16854,9 @@ class Parser {
         this.drawableMap.set('D', box4);
         this.dimensionsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('E', box5);
-        this.dimensionsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.dimensionsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1.5, 1.5, 1.5));
         this.drawableMap.set('F', box6);
-        this.dimensionsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.dimensionsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
         this.drawableMap.set('W', window1);
         this.dimensionsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('Y', door);
