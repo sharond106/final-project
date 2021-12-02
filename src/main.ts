@@ -76,7 +76,7 @@ function main() {
   let obj2: string = readTextFile('./Meshes/box3.obj');
   box3 = new Mesh(obj2, vec3.fromValues(0, 0, 0));
   box3.create();
-  let obj3: string = readTextFile('./Meshes/box1.obj');
+  let obj3: string = readTextFile('./Meshes/box1round.obj');
   box4 = new Mesh(obj3, vec3.fromValues(0, 0, 0));
   box4.create();
   let obj4: string = readTextFile('./Meshes/window1.obj');
@@ -85,10 +85,10 @@ function main() {
   let obj5: string = readTextFile('./Meshes/door.obj');
   door1 = new Mesh(obj5, vec3.fromValues(0, 0, 0));
   door1.create();
-  let obj6: string = readTextFile('./Meshes/box2.obj');
+  let obj6: string = readTextFile('./Meshes/box2round.obj');
   box5 = new Mesh(obj6, vec3.fromValues(0, 0, 0));
   box5.create();
-  let obj7: string = readTextFile('./Meshes/box3.obj');
+  let obj7: string = readTextFile('./Meshes/box3round.obj');
   box6 = new Mesh(obj7, vec3.fromValues(0, 0, 0));
   box6.create();
 
