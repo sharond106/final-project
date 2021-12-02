@@ -68,7 +68,7 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-  let obj0: string = readTextFile('./Meshes/box1.obj');
+  let obj0: string = readTextFile('./Meshes/beach_chair_C.obj');
   box1 = new Mesh(obj0, vec3.fromValues(0, 0, 0));
   box1.create();
   let obj1: string = readTextFile('./Meshes/box2.obj');
@@ -96,7 +96,7 @@ function main() {
   window2 = new Mesh(obj8, vec3.fromValues(0, 0, 0));
   window2.create();
 
-  
+
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
