@@ -55,7 +55,7 @@ float fbm(float x, float y, float z) {
   float total = 0.;
   float persistence = 0.5f;
   for(float i = 1.; i <= 6.; i++) {
-    float freq = pow(2., i);
+    float freq = pow(2., i) / 2.;
     float amp = pow(persistence, i);
     total += interpNoise3D(x * freq, y * freq, z * freq) * amp;
   }
@@ -66,7 +66,7 @@ float noiseTable(vec3 p) {
   float f = fbm(p.x, p.y, p.z);
   vec4 pos = fs_Nor + -1.;
   pos += f; 
-  return fbm(pos.x, pos.y, pos.z);
+  return abs(f) / 4. + .75;
 }
 
 void main()
@@ -84,7 +84,7 @@ void main()
         float rand = random1(vec3(floor(fs_Pos.x / .3),floor(fs_Pos.y / .3),floor(fs_Pos.z / .3)));
         col = mix(vec3(0), u_Color.rgb * 20., (sin(.5 * u_Time * rand) + 1.)/2.);
     }
-    out_Col = vec4(col * lightIntensity, fs_Col[3]);
+    out_Col = vec4(col * lightIntensity * noiseTable(vec3(fs_Pos)), fs_Col[3]);
     // out_Col = vec4((fs_Pos + 3.) / 6.);
     // out_Col = vec4(fs_Nor.rgb, 1)  ;
     // out_Col = vec4(1);
