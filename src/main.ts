@@ -27,6 +27,7 @@ let box4: Mesh;
 let box5: Mesh;
 let box6: Mesh;
 let window1: Mesh;
+let window2: Mesh;
 let door1: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
@@ -91,12 +92,15 @@ function main() {
   let obj7: string = readTextFile('./Meshes/box3.obj');
   box6 = new Mesh(obj7, vec3.fromValues(0, 0, 0));
   box6.create();
+  let obj8: string = readTextFile('./Meshes/window2.obj');
+  window2 = new Mesh(obj8, vec3.fromValues(0, 0, 0));
+  window2.create();
 
   
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1);
+  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2);
   shapeGrammar.parse();
 
   const camera = new Camera(vec3.fromValues(0, 0, 10), vec3.fromValues(0, 0, 0));
@@ -127,7 +131,7 @@ function main() {
     renderer.clear();
     renderer.render(camera, flat, [screenQuad], color.color);
     renderer.render(camera, instancedShader, [
-      box1, box2, box3, box4, box5, box6, window1, door1
+      box1, box2, box3, box4, box5, box6, window1, door1, window2
     ],
     color.color);
     // stats.end();

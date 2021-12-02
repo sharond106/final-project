@@ -20,7 +20,7 @@ class PolygonLibrary {
     return dimensions;
   }
 
-  intersectsSomething(currShape: Shape, p: vec3): boolean {
+  intersectsSomething(currShape: Shape, pos: vec3, p: vec3): boolean {
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
       let relativeP: vec3 = vec3.fromValues(0, 0, 0);
@@ -33,14 +33,17 @@ class PolygonLibrary {
         return true;
       }
     }
+    console.log("p=" + pos)
     for (let i = 0; i < this.windows.length; i++) {
       let shape = this.windows[i];
+      console.log("total:" + this.windows.length + " " + shape.symbol + " " + shape.position);
       let relativeP: vec3 = vec3.fromValues(0, 0, 0);
       let dimensions: vec3 = this.getShapeDimensions(shape);
       vec3.subtract(relativeP, p, shape.position);
       relativeP[1] -= dimensions[1] / 2.;
       vec3.divide(dimensions, dimensions, vec3.fromValues(2, 2, 2));
-      if (shape.isInside(relativeP, dimensions)) {
+      if (vec3.equals(shape.position, pos) || shape.isInside(relativeP, dimensions)) {
+        console.log("inside")
         return true;
       }
     }
@@ -48,35 +51,35 @@ class PolygonLibrary {
   }
 
   // center = center of object, leftEdgeDist = distance from center of left edge
-  objIntersectsSomething(currShape: Shape, center: vec3, leftEdgeDist: vec3, topEdgeDist: vec3): boolean {
+  objIntersectsSomething(currShape: Shape, pos: vec3, center: vec3, leftEdgeDist: vec3, topEdgeDist: vec3): boolean {
     let topLeft: vec3 = vec3.fromValues(0, 0, 0);
     vec3.subtract(topLeft, center, leftEdgeDist);
     vec3.add(topLeft, topLeft, topEdgeDist);
-    if (this.intersectsSomething(currShape, topLeft)) {
+    if (this.intersectsSomething(currShape, pos, topLeft)) {
       return true;
     }
     let bottomLeft: vec3 = vec3.fromValues(0, 0, 0);
     vec3.subtract(bottomLeft, center, leftEdgeDist);
     vec3.subtract(bottomLeft, bottomLeft, topEdgeDist);
-    if (this.intersectsSomething(currShape, bottomLeft)) {
+    if (this.intersectsSomething(currShape, pos, bottomLeft)) {
       return true;
     }
     let topRight: vec3 = vec3.fromValues(0, 0, 0);
     vec3.add(topRight, center, leftEdgeDist);
     vec3.add(topRight, topRight, topEdgeDist);
-    if (this.intersectsSomething(currShape, topRight)) {
+    if (this.intersectsSomething(currShape, pos, topRight)) {
       return true;
     }
     let bottomRight: vec3 = vec3.fromValues(0, 0, 0);
     vec3.add(bottomRight, center, leftEdgeDist);
     vec3.subtract(bottomRight, bottomRight, topEdgeDist);
-    if (this.intersectsSomething(currShape, bottomRight)) {
+    if (this.intersectsSomething(currShape, pos, bottomRight)) {
       return true;
     }
     return false;
   }
 
-  subdivideWindows(shape: Shape, outSymbol: string) : Shape[] {
+  subdivideWindows(shape: Shape, outSymbols: string[]) : Shape[] {
     let dimensions = this.getShapeDimensions(shape);
 
     // how many rows of windows we want on each face
@@ -90,44 +93,48 @@ class PolygonLibrary {
     //front wall
     let unifNum = .4;
     let unifSmall = .001
+    let outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < frontBackCols; j++) {
         let pos = vec3.fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, dimensions[2] / 2.);
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2] + unifSmall), vec3.fromValues(unifNum, 0, 0), vec3.fromValues(0, unifNum, 0))) {
+        if (this.objIntersectsSomething(shape, pos, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2] + unifSmall), vec3.fromValues(unifNum, 0, 0), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
       }
     }
     // back wall
+    outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < frontBackCols; j++) {
         let pos = vec3.fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, -dimensions[2] / 2.);
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2] - unifSmall), vec3.fromValues(unifNum, 0, 0), vec3.fromValues(0, unifNum, 0))) {
+        if (this.objIntersectsSomething(shape, pos, vec3.fromValues(pos[0], pos[1] + unifNum, pos[2] - unifSmall), vec3.fromValues(unifNum, 0, 0), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(0, 0, -1), vec3.fromValues(-1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
       }
     }
     // left wall
+    outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < leftRightCols; j++) {
         let pos = vec3.fromValues(-dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0] - unifSmall, pos[1] + unifNum, pos[2]), vec3.fromValues(0, 0, unifNum), vec3.fromValues(0, unifNum, 0))) {
+        if (this.objIntersectsSomething(shape, pos, vec3.fromValues(pos[0] - unifSmall, pos[1] + unifNum, pos[2]), vec3.fromValues(0, 0, unifNum), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(-1, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
       }
     }
     // right wall
+    outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < leftRightCols; j++) {
         let pos = vec3.fromValues(dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
         vec3.add(pos, pos, shape.position);
-        if (this.objIntersectsSomething(shape, vec3.fromValues(pos[0]  + unifSmall, pos[1] + unifNum, pos[2]), vec3.fromValues(0, 0, unifNum), vec3.fromValues(0, unifNum, 0))) {
+        if (this.objIntersectsSomething(shape, pos, vec3.fromValues(pos[0]  + unifSmall, pos[1] + unifNum, pos[2]), vec3.fromValues(0, 0, unifNum), vec3.fromValues(0, unifNum, 0))) {
           continue;
         }
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(1, 0, 0), vec3.fromValues(0, 0, -1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));

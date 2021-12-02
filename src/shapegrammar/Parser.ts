@@ -17,8 +17,8 @@ class Parser {
   colorsMap: Map<string, vec3> = new Map();
   polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh) {
-    this.iterations = 3;
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh) {
+    this.iterations = 5;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
@@ -32,7 +32,9 @@ class Parser {
     this.drawableMap.set('F', box6);
     this.dimensionsMap.set('F', vec3.fromValues(2, 2, 2));
     this.drawableMap.set('W', window1);
-    this.dimensionsMap.set('W', vec3.fromValues(1, 1, 1));
+    this.dimensionsMap.set('W', vec3.fromValues(1, 1, .2));
+    this.drawableMap.set('X', window2);
+    this.dimensionsMap.set('X', vec3.fromValues(1, 1, .2));
     this.drawableMap.set('Y', door);
     this.dimensionsMap.set('Y', vec3.fromValues(1, 1, 1));
     this.setColorMap()
@@ -46,8 +48,9 @@ class Parser {
     this.colorsMap.set('D',vec3.fromValues(.8, .8, .8)); 
     this.colorsMap.set('E',vec3.fromValues(.8, .8, .8)); 
     this.colorsMap.set('F',vec3.fromValues(.8, .8, .8)); 
-    this.colorsMap.set('W',vec3.fromValues(34/255, 180/255, 199/255)); 
-    this.colorsMap.set('Y',vec3.fromValues(34/255, 180/255, 199/255)); 
+    this.colorsMap.set('W',vec3.fromValues(34/255, 130/255, 179/255)); 
+    this.colorsMap.set('X',vec3.fromValues(34/255, 130/255, 179/255)); 
+    this.colorsMap.set('Y',vec3.fromValues(34/255, 130/255, 179/255)); 
   }
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
@@ -104,7 +107,6 @@ class Parser {
           continue;
         }
         // Get the symbol's successors and save them until next iteration
-        
         let rules: GrammarRule[] = this.grammarRules.get(currShape.symbol);
         console.log(currShape.symbol);
         console.log(rules);
@@ -116,16 +118,12 @@ class Parser {
     }
   }
 
-  getRandomNum(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-  }
-
   subdivide() {
     this.polyLibrary.shapes = this.shapes;
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
       if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C")  {
-        let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
+        let outShapes = this.polyLibrary.subdivideWindows(shape, ["W", "X"]);
         this.shapes = this.shapes.concat(outShapes);
         this.windows = this.windows.concat(outShapes);
       }
