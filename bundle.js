@@ -6239,7 +6239,7 @@ function main() {
     let obj2 = readTextFile('./Meshes/box3.obj');
     box3 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj2, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box3.create();
-    let obj3 = readTextFile('./Meshes/box1.obj');
+    let obj3 = readTextFile('./Meshes/box1round.obj');
     box4 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj3, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box4.create();
     let obj4 = readTextFile('./Meshes/window1.obj');
@@ -6248,10 +6248,10 @@ function main() {
     let obj5 = readTextFile('./Meshes/door.obj');
     door1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj5, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     door1.create();
-    let obj6 = readTextFile('./Meshes/box2.obj');
+    let obj6 = readTextFile('./Meshes/box2round.obj');
     box5 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj6, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box5.create();
-    let obj7 = readTextFile('./Meshes/box3.obj');
+    let obj7 = readTextFile('./Meshes/box3round.obj');
     box6 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj7, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box6.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
@@ -16845,7 +16845,7 @@ class Parser {
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 3;
+        this.iterations = 4;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
