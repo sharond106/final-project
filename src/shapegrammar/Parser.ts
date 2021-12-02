@@ -42,12 +42,12 @@ class Parser {
   }
 
   setColorMap() {
-    this.colorsMap.set('A',vec3.fromValues(.8, .8, .8)); 
-    this.colorsMap.set('B',vec3.fromValues(.8, .8, .8)); 
-    this.colorsMap.set('C',vec3.fromValues(.8, .8, .8)); 
-    this.colorsMap.set('D',vec3.fromValues(.8, .8, .8)); 
-    this.colorsMap.set('E',vec3.fromValues(.8, .8, .8)); 
-    this.colorsMap.set('F',vec3.fromValues(.8, .8, .8)); 
+    this.colorsMap.set('A',vec3.fromValues(1, 1, 1)); 
+    this.colorsMap.set('B',vec3.fromValues(1, 1, 1)); 
+    this.colorsMap.set('C',vec3.fromValues(1, 1, 1)); 
+    this.colorsMap.set('D',vec3.fromValues(1, 1, 1)); 
+    this.colorsMap.set('E',vec3.fromValues(1, 1, 1)); 
+    this.colorsMap.set('F',vec3.fromValues(1, 1, 1)); 
     this.colorsMap.set('W',vec3.fromValues(34/255, 130/255, 179/255)); 
     this.colorsMap.set('X',vec3.fromValues(34/255, 130/255, 179/255)); 
     this.colorsMap.set('Y',vec3.fromValues(34/255, 130/255, 179/255)); 
