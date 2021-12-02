@@ -60,6 +60,7 @@ Future plans
 - Add other decorative meshes
 - Add features to polygon library to be able to subdivide meshes in other ways
 - Create scene/background for building
+- Add GUI elements
 
 Example generations
 ![](images/house1.PNG)
@@ -77,9 +78,12 @@ Implemented
 
 Future plans
 - Fix intersection testing bugs
-- Possibly improve the grammar rules
+- Improve the grammar rules
 - Add texturing
+- Add lighting
+- Make meshes look more Greek villa like (bevel edges)
 - Create scene/background for building
+- Add GUI elements
 
 Example generations 2
 ![](images/house4.PNG)

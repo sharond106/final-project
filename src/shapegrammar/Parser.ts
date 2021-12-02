@@ -9,6 +9,7 @@ class Parser {
   iterations: number;
   shapes: Shape[] = [];
   terminalShapes: Shape[] = [];
+  windows: Shape[] = [];
   terminalMap: Map<string, boolean> = new Map();
   grammarRules: Map<string, GrammarRule[]> = new Map();
   drawableMap: Map<string, Mesh> = new Map();
@@ -17,7 +18,11 @@ class Parser {
   polyLibrary: PolygonLibrary;
 
   constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh) {
+<<<<<<< HEAD
     this.iterations = 4;
+=======
+    this.iterations = 3;
+>>>>>>> c46bc3dc67d7fa8e0b7242bf4c13bec1dc46d76f
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
@@ -126,14 +131,15 @@ class Parser {
       if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C")  {
         let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
         this.shapes = this.shapes.concat(outShapes);
+        this.windows = this.windows.concat(outShapes);
       }
     }
 
     //Makes one door
     let bottomWindows: Shape[] = [];
-    for (let i = 0; i < this.shapes.length; i++) {
-      let shape = this.shapes[i];
-      if (shape.symbol == "W" && shape.position[1] == 0) {
+    for (let i = 0; i < this.windows.length; i++) {
+      let shape = this.windows[i];
+      if (shape.position[1] == 0) {
         bottomWindows.push(shape);
       }
     }
