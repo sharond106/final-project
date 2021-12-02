@@ -16839,12 +16839,13 @@ class Parser {
     constructor(box1, box2, box3, box4, box5, box6, window1, door) {
         this.shapes = [];
         this.terminalShapes = [];
+        this.windows = [];
         this.terminalMap = new Map();
         this.grammarRules = new Map();
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 7;
+        this.iterations = 3;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
@@ -16940,13 +16941,14 @@ class Parser {
             if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C") {
                 let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
                 this.shapes = this.shapes.concat(outShapes);
+                this.windows = this.windows.concat(outShapes);
             }
         }
         //Makes one door
         let bottomWindows = [];
-        for (let i = 0; i < this.shapes.length; i++) {
-            let shape = this.shapes[i];
-            if (shape.symbol == "W" && shape.position[1] == 0) {
+        for (let i = 0; i < this.windows.length; i++) {
+            let shape = this.windows[i];
+            if (shape.position[1] == 0) {
                 bottomWindows.push(shape);
             }
         }
@@ -17110,6 +17112,7 @@ class PolygonLibrary {
     constructor(dimensions) {
         this.dimensionsMap = new Map();
         this.shapes = [];
+        this.windows = [];
         this.dimensionsMap = dimensions;
         this.windowDimensions = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec2 */].fromValues(1, 1);
     }
@@ -17130,6 +17133,17 @@ class PolygonLibrary {
             relativeP[1] -= dimensions[1] / 2.;
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].divide(dimensions, dimensions, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
             if (shape != currShape && shape.isInside(relativeP, dimensions)) {
+                return true;
+            }
+        }
+        for (let i = 0; i < this.windows.length; i++) {
+            let shape = this.windows[i];
+            let relativeP = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
+            let dimensions = this.getShapeDimensions(shape);
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(relativeP, p, shape.position);
+            relativeP[1] -= dimensions[1] / 2.;
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].divide(dimensions, dimensions, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
+            if (shape.isInside(relativeP, dimensions)) {
                 return true;
             }
         }
@@ -17218,6 +17232,7 @@ class PolygonLibrary {
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
+        this.windows = this.windows.concat(outShapes);
         return outShapes;
     }
 }
