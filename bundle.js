@@ -6194,6 +6194,7 @@ let box4;
 let box5;
 let box6;
 let window1;
+let window2;
 let door1;
 let screenQuad;
 let time = 0.0;
@@ -6254,9 +6255,12 @@ function main() {
     let obj7 = readTextFile('./Meshes/box3round.obj');
     box6 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj7, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box6.create();
+    let obj8 = readTextFile('./Meshes/window2.obj');
+    window2 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj8, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
+    window2.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6282,7 +6286,7 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad], color.color);
         renderer.render(camera, instancedShader, [
-            box1, box2, box3, box4, box5, box6, window1, door1
+            box1, box2, box3, box4, box5, box6, window1, door1, window2
         ], color.color);
         // stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
@@ -16836,7 +16840,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(box1, box2, box3, box4, box5, box6, window1, door) {
+    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2) {
         this.shapes = [];
         this.terminalShapes = [];
         this.windows = [];
@@ -16845,7 +16849,7 @@ class Parser {
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 4;
+        this.iterations = 5;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
@@ -16859,7 +16863,9 @@ class Parser {
         this.drawableMap.set('F', box6);
         this.dimensionsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
         this.drawableMap.set('W', window1);
-        this.dimensionsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.dimensionsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, .2));
+        this.drawableMap.set('X', window2);
+        this.dimensionsMap.set('X', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, .2));
         this.drawableMap.set('Y', door);
         this.dimensionsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.setColorMap();
@@ -16872,8 +16878,9 @@ class Parser {
         this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
         this.colorsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
         this.colorsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
-        this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 180 / 255, 199 / 255));
-        this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 180 / 255, 199 / 255));
+        this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
+        this.colorsMap.set('X', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
+        this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
     }
     // Initialize this.shapes, this.terminalShapes, this.terminalMap
     initShapes() {
@@ -16931,15 +16938,12 @@ class Parser {
             this.shapes = newShapes;
         }
     }
-    getRandomNum(min, max) {
-        return Math.random() * (max - min) + min;
-    }
     subdivide() {
         this.polyLibrary.shapes = this.shapes;
         for (let i = 0; i < this.shapes.length; i++) {
             let shape = this.shapes[i];
             if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C") {
-                let outShapes = this.polyLibrary.subdivideWindows(shape, "W");
+                let outShapes = this.polyLibrary.subdivideWindows(shape, ["W", "X"]);
                 this.shapes = this.shapes.concat(outShapes);
                 this.windows = this.windows.concat(outShapes);
             }
@@ -17123,7 +17127,7 @@ class PolygonLibrary {
         dimensions[2] *= shape.scale[2];
         return dimensions;
     }
-    intersectsSomething(currShape, p) {
+    intersectsSomething(currShape, pos, p) {
         for (let i = 0; i < this.shapes.length; i++) {
             let shape = this.shapes[i];
             let relativeP = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
@@ -17136,48 +17140,51 @@ class PolygonLibrary {
                 return true;
             }
         }
+        console.log("p=" + pos);
         for (let i = 0; i < this.windows.length; i++) {
             let shape = this.windows[i];
+            console.log("total:" + this.windows.length + " " + shape.symbol + " " + shape.position);
             let relativeP = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
             let dimensions = this.getShapeDimensions(shape);
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(relativeP, p, shape.position);
             relativeP[1] -= dimensions[1] / 2.;
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].divide(dimensions, dimensions, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
-            if (shape.isInside(relativeP, dimensions)) {
+            if (__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].equals(shape.position, pos) || shape.isInside(relativeP, dimensions)) {
+                console.log("inside");
                 return true;
             }
         }
         return false;
     }
     // center = center of object, leftEdgeDist = distance from center of left edge
-    objIntersectsSomething(currShape, center, leftEdgeDist, topEdgeDist) {
+    objIntersectsSomething(currShape, pos, center, leftEdgeDist, topEdgeDist) {
         let topLeft = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(topLeft, center, leftEdgeDist);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(topLeft, topLeft, topEdgeDist);
-        if (this.intersectsSomething(currShape, topLeft)) {
+        if (this.intersectsSomething(currShape, pos, topLeft)) {
             return true;
         }
         let bottomLeft = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomLeft, center, leftEdgeDist);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomLeft, bottomLeft, topEdgeDist);
-        if (this.intersectsSomething(currShape, bottomLeft)) {
+        if (this.intersectsSomething(currShape, pos, bottomLeft)) {
             return true;
         }
         let topRight = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(topRight, center, leftEdgeDist);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(topRight, topRight, topEdgeDist);
-        if (this.intersectsSomething(currShape, topRight)) {
+        if (this.intersectsSomething(currShape, pos, topRight)) {
             return true;
         }
         let bottomRight = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(bottomRight, center, leftEdgeDist);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomRight, bottomRight, topEdgeDist);
-        if (this.intersectsSomething(currShape, bottomRight)) {
+        if (this.intersectsSomething(currShape, pos, bottomRight)) {
             return true;
         }
         return false;
     }
-    subdivideWindows(shape, outSymbol) {
+    subdivideWindows(shape, outSymbols) {
         let dimensions = this.getShapeDimensions(shape);
         // how many rows of windows we want on each face
         let rows = Math.floor(dimensions[1]);
@@ -17189,44 +17196,48 @@ class PolygonLibrary {
         //front wall
         let unifNum = .4;
         let unifSmall = .001;
+        let outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < frontBackCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, dimensions[2] / 2.);
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2] + unifSmall), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(unifNum, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
+                if (this.objIntersectsSomething(shape, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2] + unifSmall), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(unifNum, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
         // back wall
+        outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < frontBackCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / frontBackCols / 2. + j - (dimensions[0] / 2.), i, -dimensions[2] / 2.);
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2] - unifSmall), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(unifNum, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
+                if (this.objIntersectsSomething(shape, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0], pos[1] + unifNum, pos[2] - unifSmall), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(unifNum, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
         // left wall
+        outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < leftRightCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0] - unifSmall, pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, unifNum), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
+                if (this.objIntersectsSomething(shape, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0] - unifSmall, pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, unifNum), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(-1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
             }
         }
         // right wall
+        outSymbol = outSymbols[Math.floor(Math.random() * outSymbols.length)];
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < leftRightCols; j++) {
                 let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(dimensions[0] / 2., i, dimensions[2] / leftRightCols / 2. + j - (dimensions[2] / 2.));
                 __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(pos, pos, shape.position);
-                if (this.objIntersectsSomething(shape, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0] + unifSmall, pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, unifNum), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
+                if (this.objIntersectsSomething(shape, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(pos[0] + unifSmall, pos[1] + unifNum, pos[2]), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, unifNum), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, unifNum, 0))) {
                     continue;
                 }
                 outShapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */](outSymbol, pos, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, -1), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
