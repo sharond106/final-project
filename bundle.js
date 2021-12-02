@@ -16872,12 +16872,12 @@ class Parser {
         this.polyLibrary = new __WEBPACK_IMPORTED_MODULE_4__PolygonLibrary__["a" /* default */](this.dimensionsMap);
     }
     setColorMap() {
-        this.colorsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
-        this.colorsMap.set('B', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
-        this.colorsMap.set('C', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
-        this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
-        this.colorsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
-        this.colorsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(.8, .8, .8));
+        this.colorsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.colorsMap.set('B', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.colorsMap.set('C', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.colorsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.colorsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
         this.colorsMap.set('X', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
         this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
