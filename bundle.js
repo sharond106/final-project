@@ -6231,7 +6231,7 @@ function main() {
     // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
     // Later, we can import `gl` from `globals.ts` to access it
     Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* setGL */])(gl);
-    let obj0 = readTextFile('./Meshes/box1.obj');
+    let obj0 = readTextFile('./Meshes/beach_chair_C.obj');
     box1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj0, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box1.create();
     let obj1 = readTextFile('./Meshes/box2.obj');
@@ -16849,7 +16849,7 @@ class Parser {
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 5;
+        this.iterations = 1;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
