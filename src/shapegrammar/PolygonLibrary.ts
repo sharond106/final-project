@@ -5,6 +5,7 @@ class PolygonLibrary {
   dimensionsMap: Map<string, vec3> = new Map();
   windowDimensions: vec2;
   shapes: Shape[] = [];
+  windows: Shape[] = [];
   
   constructor(dimensions: Map<string, vec3>) {
     this.dimensionsMap = dimensions;
@@ -29,6 +30,17 @@ class PolygonLibrary {
       relativeP[1] -= dimensions[1] / 2.;
       vec3.divide(dimensions, dimensions, vec3.fromValues(2, 2, 2));
       if (shape != currShape && shape.isInside(relativeP, dimensions)) {
+        return true;
+      }
+    }
+    for (let i = 0; i < this.windows.length; i++) {
+      let shape = this.windows[i];
+      let relativeP: vec3 = vec3.fromValues(0, 0, 0);
+      let dimensions: vec3 = this.getShapeDimensions(shape);
+      vec3.subtract(relativeP, p, shape.position);
+      relativeP[1] -= dimensions[1] / 2.;
+      vec3.divide(dimensions, dimensions, vec3.fromValues(2, 2, 2));
+      if (shape.isInside(relativeP, dimensions)) {
         return true;
       }
     }
@@ -121,6 +133,7 @@ class PolygonLibrary {
         outShapes.push(new Shape(outSymbol, pos, vec3.fromValues(1, 0, 0), vec3.fromValues(0, 0, -1), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
       }
     }
+    this.windows = this.windows.concat(outShapes);
     return outShapes;
   }
 }
