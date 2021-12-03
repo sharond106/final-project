@@ -6196,6 +6196,7 @@ let box6;
 let window1;
 let window2;
 let door1;
+let terrace;
 let screenQuad;
 let time = 0.0;
 let prevAngle = 3.0;
@@ -6231,13 +6232,13 @@ function main() {
     // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
     // Later, we can import `gl` from `globals.ts` to access it
     Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* setGL */])(gl);
-    let obj0 = readTextFile('./Meshes/beach_chair_C.obj');
+    let obj0 = readTextFile('./Meshes/box1round.obj');
     box1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj0, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box1.create();
-    let obj1 = readTextFile('./Meshes/box2.obj');
+    let obj1 = readTextFile('./Meshes/box2round.obj');
     box2 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj1, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box2.create();
-    let obj2 = readTextFile('./Meshes/box3.obj');
+    let obj2 = readTextFile('./Meshes/boxround3.obj');
     box3 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj2, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box3.create();
     let obj3 = readTextFile('./Meshes/box1round.obj');
@@ -6252,15 +6253,18 @@ function main() {
     let obj6 = readTextFile('./Meshes/box2round.obj');
     box5 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj6, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box5.create();
-    let obj7 = readTextFile('./Meshes/box3round.obj');
+    let obj7 = readTextFile('./Meshes/boxround3.obj');
     box6 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj7, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box6.create();
     let obj8 = readTextFile('./Meshes/window2.obj');
     window2 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj8, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     window2.create();
+    let obj9 = readTextFile('./Meshes/terrace.obj');
+    terrace = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj9, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
+    terrace.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6286,7 +6290,7 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad], color.color);
         renderer.render(camera, instancedShader, [
-            box1, box2, box3, box4, box5, box6, window1, door1, window2
+            box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace
         ], color.color);
         // stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
@@ -16840,7 +16844,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2) {
+    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2, terrace) {
         this.shapes = [];
         this.terminalShapes = [];
         this.windows = [];
@@ -16849,7 +16853,7 @@ class Parser {
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 1;
+        this.iterations = 4;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
@@ -16862,6 +16866,8 @@ class Parser {
         this.dimensionsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1.5, 1.5, 1.5));
         this.drawableMap.set('F', box6);
         this.dimensionsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
+        this.drawableMap.set('T', terrace);
+        this.dimensionsMap.set('T', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('W', window1);
         this.dimensionsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, .2));
         this.drawableMap.set('X', window2);
@@ -16878,6 +16884,7 @@ class Parser {
         this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.colorsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.colorsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
+        this.colorsMap.set('T', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(197 / 255, 211 / 255, 230 / 255));
         this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
         this.colorsMap.set('X', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
         this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
@@ -16888,10 +16895,27 @@ class Parser {
         this.terminalMap.set("D", true);
         this.terminalMap.set("E", true);
         this.terminalMap.set("F", true);
+        this.terminalMap.set("T", true);
         this.terminalMap.set("W", true);
     }
-    initRule(nextSymbols, tx, ty, tz, rx, ry, rz, sx, sy, sz) {
+    flipList(l) {
+        for (let i = 0; i < l.length; i++) {
+            l[i] *= -1;
+        }
+    }
+    initRule(nextSymbols, tx, ty, tz, rx, ry, rz, sx, sy, sz, randomizeDirection) {
         let tRules = [];
+        if (randomizeDirection) {
+            let seed = Math.random();
+            if (seed > .5) {
+                this.flipList(tx);
+            }
+            if (seed > .75 || seed < .25) {
+                let l = tx;
+                tx = tz;
+                tz = l;
+            }
+        }
         for (let i = 0; i < nextSymbols.length; i++) {
             tRules.push(new __WEBPACK_IMPORTED_MODULE_2__TransformationRule__["a" /* default */](tx[i], ty[i], tz[i], rx[i], ry[i], rz[i], sx[i], sy[i], sz[i]));
         }
@@ -16907,14 +16931,15 @@ class Parser {
     }
     // Initialize this.grammarRules
     initRules() {
-        this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-        this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
-        this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5]));
-        this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-        this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]));
-        this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-        this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
-        this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1]));
+        this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+        this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1], false));
+        this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5], false));
+        this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+        this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], false));
+        this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+        this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1], false));
+        this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1], false));
+        this.initEntry("C", this.initRule(["F", "T", "T", "T", "T", "T", "T"], [0, 1.5, 2.5, 3.5, 1.5, 2.5, 3.5], [0, 0, 0, 0, 0, 0, 0], [0, .5, .5, .5, -.5, -.5, -.5], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], true));
     }
     // Expands this.shapes and this.terminalShapes for this.iterations
     expand() {
@@ -16942,7 +16967,8 @@ class Parser {
         this.polyLibrary.shapes = this.shapes;
         for (let i = 0; i < this.shapes.length; i++) {
             let shape = this.shapes[i];
-            if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C") {
+            if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C" ||
+                shape.symbol == "D" || shape.symbol == "E" || shape.symbol == "F") {
                 let outShapes = this.polyLibrary.subdivideWindows(shape, ["W", "X"]);
                 this.shapes = this.shapes.concat(outShapes);
                 this.windows = this.windows.concat(outShapes);
@@ -17180,6 +17206,9 @@ class PolygonLibrary {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(bottomRight, center, leftEdgeDist);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(bottomRight, bottomRight, topEdgeDist);
         if (this.intersectsSomething(currShape, pos, bottomRight)) {
+            return true;
+        }
+        if (Math.random() > .5) {
             return true;
         }
         return false;
