@@ -76,6 +76,9 @@ class PolygonLibrary {
     if (this.intersectsSomething(currShape, pos, bottomRight)) {
       return true;
     }
+    if (Math.random() > .5) {
+      return true;
+    }
     return false;
   }
 

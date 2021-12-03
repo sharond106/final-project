@@ -17,8 +17,8 @@ class Parser {
   colorsMap: Map<string, vec3> = new Map();
   polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh) {
-    this.iterations = 1;
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh, terrace: Mesh) {
+    this.iterations = 4;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
@@ -31,6 +31,8 @@ class Parser {
     this.dimensionsMap.set('E', vec3.fromValues(1.5, 1.5, 1.5));
     this.drawableMap.set('F', box6);
     this.dimensionsMap.set('F', vec3.fromValues(2, 2, 2));
+    this.drawableMap.set('T', terrace);
+    this.dimensionsMap.set('T', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('W', window1);
     this.dimensionsMap.set('W', vec3.fromValues(1, 1, .2));
     this.drawableMap.set('X', window2);
@@ -48,26 +50,47 @@ class Parser {
     this.colorsMap.set('D',vec3.fromValues(1, 1, 1)); 
     this.colorsMap.set('E',vec3.fromValues(1, 1, 1)); 
     this.colorsMap.set('F',vec3.fromValues(1, 1, 1)); 
+    this.colorsMap.set('T',vec3.fromValues(197/255, 211/255, 230/255)); 
     this.colorsMap.set('W',vec3.fromValues(34/255, 130/255, 179/255)); 
     this.colorsMap.set('X',vec3.fromValues(34/255, 130/255, 179/255)); 
     this.colorsMap.set('Y',vec3.fromValues(34/255, 130/255, 179/255)); 
   }
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
-  initShapes() {
+  initShapes() {  
     this.shapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
     this.terminalMap.set("D", true);
     this.terminalMap.set("E", true);
     this.terminalMap.set("F", true);
+    this.terminalMap.set("T", true);
     this.terminalMap.set("W", true);
+  }
+
+  flipList(l: number[]) {
+    for (let i = 0; i < l.length; i++) {
+      l[i] *= -1
+    }
   }
 
   initRule(nextSymbols: string[], 
     tx: number[], ty: number[], tz: number[], 
     rx: number[], ry: number[], rz: number[],
-    sx: number[], sy: number[], sz: number[]) : GrammarRule {
+    sx: number[], sy: number[], sz: number[],
+    randomizeDirection: boolean) : GrammarRule {
     
     let tRules: TransformationRule[] = [];
+    
+    if (randomizeDirection) {
+      let seed: number = Math.random();
+      if (seed > .5) {
+        this.flipList(tx);
+      }
+      if (seed > .75 || seed < .25) {
+        let l: number[] = tx;
+        tx = tz;
+        tz = l;
+      }
+    }
 
     for (let i = 0; i < nextSymbols.length; i++) {
       tRules.push(new TransformationRule(tx[i], ty[i], tz[i], rx[i], ry[i], rz[i], sx[i], sy[i], sz[i]))
@@ -85,14 +108,19 @@ class Parser {
 
   // Initialize this.grammarRules
   initRules() {
-    this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1]));
-    this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5]));
-    this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]));
-    this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1]));
-    this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1]));
-    this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1]));
+    this.initEntry("A", this.initRule(["A", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+    this.initEntry("A", this.initRule(["A", "A", "B"], [0, 1, 1], [0, 0, 0], [0, .5, -.75], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1.5, 1], [1, 1, 1], [1, 1, 1], false));
+    this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5], false));
+    this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+    this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], false));
+    this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+    this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1], false));
+    this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1], false));
+    this.initEntry("C", this.initRule(["F", "T", "T", "T", "T", "T", "T"], 
+                                      [0, 1.5, 2.5, 3.5, 1.5, 2.5, 3.5], [0, 0, 0, 0, 0, 0, 0], [0, .5, .5 ,.5, -.5, -.5, -.5], 
+                                      [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 
+                                      [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], true));
+    
   }
 
   // Expands this.shapes and this.terminalShapes for this.iterations
@@ -122,7 +150,8 @@ class Parser {
     this.polyLibrary.shapes = this.shapes;
     for (let i = 0; i < this.shapes.length; i++) {
       let shape = this.shapes[i];
-      if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C")  {
+      if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C" || 
+          shape.symbol == "D" || shape.symbol == "E" || shape.symbol == "F")  {
         let outShapes = this.polyLibrary.subdivideWindows(shape, ["W", "X"]);
         this.shapes = this.shapes.concat(outShapes);
         this.windows = this.windows.concat(outShapes);

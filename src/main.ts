@@ -29,6 +29,7 @@ let box6: Mesh;
 let window1: Mesh;
 let window2: Mesh;
 let door1: Mesh;
+let terrace: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
 let prevAngle: number = 3.0;
@@ -68,13 +69,13 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-  let obj0: string = readTextFile('./Meshes/beach_chair_C.obj');
+  let obj0: string = readTextFile('./Meshes/box1round.obj');
   box1 = new Mesh(obj0, vec3.fromValues(0, 0, 0));
   box1.create();
-  let obj1: string = readTextFile('./Meshes/box2.obj');
+  let obj1: string = readTextFile('./Meshes/box2round.obj');
   box2 = new Mesh(obj1, vec3.fromValues(0, 0, 0));
   box2.create();
-  let obj2: string = readTextFile('./Meshes/box3.obj');
+  let obj2: string = readTextFile('./Meshes/boxround3.obj');
   box3 = new Mesh(obj2, vec3.fromValues(0, 0, 0));
   box3.create();
   let obj3: string = readTextFile('./Meshes/box1round.obj');
@@ -89,18 +90,21 @@ function main() {
   let obj6: string = readTextFile('./Meshes/box2round.obj');
   box5 = new Mesh(obj6, vec3.fromValues(0, 0, 0));
   box5.create();
-  let obj7: string = readTextFile('./Meshes/box3round.obj');
+  let obj7: string = readTextFile('./Meshes/boxround3.obj');
   box6 = new Mesh(obj7, vec3.fromValues(0, 0, 0));
   box6.create();
   let obj8: string = readTextFile('./Meshes/window2.obj');
   window2 = new Mesh(obj8, vec3.fromValues(0, 0, 0));
   window2.create();
+  let obj9: string = readTextFile('./Meshes/terrace.obj');
+  terrace = new Mesh(obj9, vec3.fromValues(0, 0, 0));
+  terrace.create();
 
 
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2);
+  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace);
   shapeGrammar.parse();
 
   const camera = new Camera(vec3.fromValues(0, 0, 10), vec3.fromValues(0, 0, 0));
@@ -131,7 +135,7 @@ function main() {
     renderer.clear();
     renderer.render(camera, flat, [screenQuad], color.color);
     renderer.render(camera, instancedShader, [
-      box1, box2, box3, box4, box5, box6, window1, door1, window2
+      box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace
     ],
     color.color);
     // stats.end();
