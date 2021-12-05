@@ -6232,16 +6232,16 @@ function main() {
     // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
     // Later, we can import `gl` from `globals.ts` to access it
     Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* setGL */])(gl);
-    let obj0 = readTextFile('./Meshes/box1round.obj');
+    let obj0 = readTextFile('./Meshes/roundbox1.obj');
     box1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj0, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box1.create();
-    let obj1 = readTextFile('./Meshes/box2round.obj');
+    let obj1 = readTextFile('./Meshes/roundbox2.obj');
     box2 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj1, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box2.create();
-    let obj2 = readTextFile('./Meshes/boxround3.obj');
+    let obj2 = readTextFile('./Meshes/roundbox3.obj');
     box3 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj2, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box3.create();
-    let obj3 = readTextFile('./Meshes/box1round.obj');
+    let obj3 = readTextFile('./Meshes/roundbox1.obj');
     box4 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj3, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box4.create();
     let obj4 = readTextFile('./Meshes/window1.obj');
@@ -6250,10 +6250,10 @@ function main() {
     let obj5 = readTextFile('./Meshes/door.obj');
     door1 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj5, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     door1.create();
-    let obj6 = readTextFile('./Meshes/box2round.obj');
+    let obj6 = readTextFile('./Meshes/roundbox2.obj');
     box5 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj6, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box5.create();
-    let obj7 = readTextFile('./Meshes/boxround3.obj');
+    let obj7 = readTextFile('./Meshes/roundbox3.obj');
     box6 = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj7, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     box6.create();
     let obj8 = readTextFile('./Meshes/window2.obj');
@@ -16947,6 +16947,10 @@ class Parser {
             let newShapes = [];
             for (let j = 0; j < this.shapes.length; j++) {
                 let currShape = this.shapes[j];
+                //Making it such tha terraces do not scale
+                if (currShape.symbol == "T") {
+                    currShape.scale = __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1.0, 1.0, 1.0);
+                }
                 // Check if shape is terminal
                 if (this.terminalMap.get(currShape.symbol) == true) {
                     this.terminalShapes.push(currShape);
