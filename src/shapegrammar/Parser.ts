@@ -129,6 +129,11 @@ class Parser {
       let newShapes: Shape[] = [];
       for (let j = 0; j < this.shapes.length; j++) {
         let currShape: Shape = this.shapes[j];
+        
+        //Making it such tha terraces do not scale
+        if (currShape.symbol == "T") {
+          currShape.scale = vec3.fromValues(1.0, 1.0, 1.0);
+        }
         // Check if shape is terminal
         if (this.terminalMap.get(currShape.symbol) == true) {
           this.terminalShapes.push(currShape);
