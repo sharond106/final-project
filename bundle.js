@@ -6199,8 +6199,11 @@ let door1;
 let terrace;
 let screenQuad;
 let time = 0.0;
-let prevAngle = 3.0;
-let prevBranchSparse = 0.0;
+let prevBuildingColor = [255., 255., 255.];
+let prevWindowColor = [197., 211., 230.];
+let prevTerraceColor = [197., 211., 230.];
+let prevIterations = 4.0;
+let prevWindowDensity = .5;
 function main() {
     // Initial display for framerate
     // const stats = Stats();
@@ -6211,14 +6214,29 @@ function main() {
     // document.body.appendChild(stats.domElement);
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_1_dat_gui__["GUI"]();
-    var color = {
-        color: [255., 255., 5.],
+    var building_color = {
+        color: [255., 255., 255.],
     };
-    // gui.addColor(color, 'color').name('Lights Color');
-    // var angle = {
-    //   angle: 3.0
-    // };
-    // gui.add(angle, 'angle', 0, 5).step(1).name('Branches Angle');
+    gui.addColor(building_color, 'color').name('Building Color');
+    var windows_color = {
+        color: [34., 130., 179.],
+    };
+    gui.addColor(windows_color, 'color').name('Windows Color');
+    var terrace_color = {
+        color: [197., 211., 230.],
+    };
+    gui.addColor(terrace_color, 'color').name('Terrace Color');
+    var iterations = {
+        number: 4.0
+    };
+    var iterations = {
+        number: 4.0
+    };
+    gui.add(iterations, 'number', 1, 8).step(1).name('Iterations');
+    var window_density = {
+        number: .5
+    };
+    gui.add(window_density, 'number', 0., 1.).name('Window Density');
     // var sparseness = {
     //   sparseness: 0
     // };
@@ -6264,7 +6282,7 @@ function main() {
     terrace.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6288,10 +6306,30 @@ function main() {
         flat.setTime(time++);
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
-        renderer.render(camera, flat, [screenQuad], color.color);
+        renderer.render(camera, flat, [screenQuad], building_color.color);
         renderer.render(camera, instancedShader, [
             box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace
-        ], color.color);
+        ], building_color.color);
+        if (windows_color.color != prevWindowColor || building_color.color != prevBuildingColor || terrace_color.color != prevTerraceColor) {
+            prevWindowColor = windows_color.color;
+            prevBuildingColor = building_color.color;
+            prevTerraceColor = terrace_color.color;
+            shapeGrammar.setColorMap(prevBuildingColor, prevWindowColor, prevTerraceColor);
+            shapeGrammar.draw();
+        }
+        if (iterations.number != prevIterations) {
+            prevIterations = iterations.number;
+            shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
+            shapeGrammar.parse();
+        }
+        if (window_density.number != prevWindowDensity) {
+            console.log(window_density.number);
+            prevWindowDensity = window_density.number;
+            shapeGrammar.polyLibrary.windowDensity = window_density.number;
+            shapeGrammar.removeWindows();
+            // shapeGrammar.subdivide();
+            shapeGrammar.draw();
+        }
         // stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
         requestAnimationFrame(tick);
@@ -16844,7 +16882,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2, terrace) {
+    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2, terrace, building_color, windows_color, terrace_color, iterations, window_density) {
         this.shapes = [];
         this.terminalShapes = [];
         this.windows = [];
@@ -16853,7 +16891,7 @@ class Parser {
         this.drawableMap = new Map();
         this.dimensionsMap = new Map();
         this.colorsMap = new Map();
-        this.iterations = 4;
+        this.iterations = iterations;
         this.drawableMap.set('A', box1);
         this.dimensionsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('B', box2);
@@ -16874,24 +16912,31 @@ class Parser {
         this.dimensionsMap.set('X', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, .2));
         this.drawableMap.set('Y', door);
         this.dimensionsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.setColorMap();
+        this.setColorMap(building_color, windows_color, terrace_color);
         this.polyLibrary = new __WEBPACK_IMPORTED_MODULE_4__PolygonLibrary__["a" /* default */](this.dimensionsMap);
+        this.polyLibrary.windowDensity = window_density;
     }
-    setColorMap() {
-        this.colorsMap.set('A', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.colorsMap.set('B', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.colorsMap.set('C', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.colorsMap.set('D', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.colorsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.colorsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
-        this.colorsMap.set('T', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(197 / 255, 211 / 255, 230 / 255));
-        this.colorsMap.set('W', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
-        this.colorsMap.set('X', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
-        this.colorsMap.set('Y', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(34 / 255, 130 / 255, 179 / 255));
+    setColorMap(building_c, windows_c, terrace_c) {
+        let building_color = __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(building_c[0], building_c[1], building_c[2]);
+        let windows_color = __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(windows_c[0], windows_c[1], windows_c[2]);
+        let terrace_color = __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(terrace_c[0], terrace_c[1], terrace_c[2]);
+        __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].divide(building_color, building_color, __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(255, 255, 255));
+        __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].divide(windows_color, windows_color, __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(255, 255, 255));
+        __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].divide(terrace_color, terrace_color, __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(255, 255, 255));
+        this.colorsMap.set('A', building_color);
+        this.colorsMap.set('B', building_color);
+        this.colorsMap.set('C', building_color);
+        this.colorsMap.set('D', building_color);
+        this.colorsMap.set('E', building_color);
+        this.colorsMap.set('F', building_color);
+        this.colorsMap.set('T', terrace_color);
+        this.colorsMap.set('W', windows_color);
+        this.colorsMap.set('X', windows_color);
+        this.colorsMap.set('Y', windows_color);
     }
     // Initialize this.shapes, this.terminalShapes, this.terminalMap
     initShapes() {
-        this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
+        this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, -1.5, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
         this.terminalMap.set("D", true);
         this.terminalMap.set("E", true);
         this.terminalMap.set("F", true);
@@ -16958,8 +17003,6 @@ class Parser {
                 }
                 // Get the symbol's successors and save them until next iteration
                 let rules = this.grammarRules.get(currShape.symbol);
-                console.log(currShape.symbol);
-                console.log(rules);
                 let rule = rules[Math.floor(Math.random() * rules.length)];
                 let successors = rule.expand(currShape);
                 newShapes = newShapes.concat(successors);
@@ -17028,6 +17071,16 @@ class Parser {
         mesh.setNumInstances(n);
         mesh.setRotateVBOs(transformCol0, transformCol1, transformCol2, transformCol3);
     }
+    removeWindows() {
+        let newShapes = [];
+        for (let i = 0; i < this.shapes.length; i++) {
+            let shape = this.shapes[i];
+            if (shape.symbol != "W" && shape.symbol != "X" && shape.symbol != "Y") {
+                newShapes.push(shape);
+            }
+        }
+        this.shapes = newShapes;
+    }
     draw() {
         this.drawableMap.forEach((value, key) => {
             let keyShapes = [];
@@ -17037,7 +17090,6 @@ class Parser {
                     keyShapes.push(this.shapes[i]);
                 }
             }
-            console.log("num for " + key + ", " + keyShapes.length);
             this.drawMesh(keyShapes, value);
         });
     }
@@ -17047,9 +17099,6 @@ class Parser {
         this.expand();
         this.shapes = this.shapes.concat(this.terminalShapes);
         this.subdivide();
-        for (let i = 0; i < this.shapes.length; i++) {
-            console.log(this.shapes[i].symbol + " " + this.shapes[i].position + " " + this.shapes[i].scale);
-        }
         this.draw();
     }
 }
@@ -17170,17 +17219,14 @@ class PolygonLibrary {
                 return true;
             }
         }
-        console.log("p=" + pos);
         for (let i = 0; i < this.windows.length; i++) {
             let shape = this.windows[i];
-            console.log("total:" + this.windows.length + " " + shape.symbol + " " + shape.position);
             let relativeP = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0);
             let dimensions = this.getShapeDimensions(shape);
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].subtract(relativeP, p, shape.position);
             relativeP[1] -= dimensions[1] / 2.;
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].divide(dimensions, dimensions, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
             if (__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].equals(shape.position, pos) || shape.isInside(relativeP, dimensions)) {
-                console.log("inside");
                 return true;
             }
         }
@@ -17212,7 +17258,8 @@ class PolygonLibrary {
         if (this.intersectsSomething(currShape, pos, bottomRight)) {
             return true;
         }
-        if (Math.random() > .5) {
+        if (Math.random() > (this.windowDensity)) {
+            console.log(this.windowDensity);
             return true;
         }
         return false;
@@ -17287,7 +17334,7 @@ class PolygonLibrary {
 /* 74 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\nin vec4 vs_transform_col0;\nin vec4 vs_transform_col1;\nin vec4 vs_transform_col2;\nin vec4 vs_transform_col3;\nin vec3 vs_Scale;\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    // fs_Pos = vs_Pos;\n    //fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vec3(vs_Pos);\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 scale = mat4(vec4(.1, 0, 0, 0), vec4(0, .1, 0, 0), vec4(0, 0, .1, 0), vec4(0, -4.2, 0, 1));\n    mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);\n    vec4 pos = vs_Pos;\n    pos = transform * vec4(vec3(pos), 1);\n    fs_Pos = pos;\n    fs_Nor = transform * vs_Nor;\n    gl_Position = u_ViewProj * pos;\n}\n"
+module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\nin vec4 vs_transform_col0;\nin vec4 vs_transform_col1;\nin vec4 vs_transform_col2;\nin vec4 vs_transform_col3;\nin vec3 vs_Scale;\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    // fs_Pos = vs_Pos;\n    //fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vec3(vs_Pos);\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 transform = mat4(vs_transform_col0, vs_transform_col1, vs_transform_col2, vs_transform_col3);\n    vec4 pos = vs_Pos;\n    pos = transform * vec4(vec3(pos), 1);\n    fs_Pos = pos;\n    fs_Nor = transform * vs_Nor;\n    gl_Position = u_ViewProj * pos;\n}\n"
 
 /***/ }),
 /* 75 */
