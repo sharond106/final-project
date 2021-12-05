@@ -6323,11 +6323,11 @@ function main() {
             shapeGrammar.parse();
         }
         if (window_density.number != prevWindowDensity) {
-            console.log(window_density.number);
+            console.log("Tired " + window_density.number);
             prevWindowDensity = window_density.number;
             shapeGrammar.polyLibrary.windowDensity = window_density.number;
             shapeGrammar.removeWindows();
-            // shapeGrammar.subdivide();
+            shapeGrammar.subdivide();
             shapeGrammar.draw();
         }
         // stats.end();
@@ -17017,6 +17017,7 @@ class Parser {
             if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C" ||
                 shape.symbol == "D" || shape.symbol == "E" || shape.symbol == "F") {
                 let outShapes = this.polyLibrary.subdivideWindows(shape, ["W", "X"]);
+                console.log(shape.symbol);
                 this.shapes = this.shapes.concat(outShapes);
                 this.windows = this.windows.concat(outShapes);
             }
@@ -17079,7 +17080,10 @@ class Parser {
                 newShapes.push(shape);
             }
         }
+        console.log("removed windows");
         this.shapes = newShapes;
+        this.windows = [];
+        this.polyLibrary.windows = [];
     }
     draw() {
         this.drawableMap.forEach((value, key) => {
