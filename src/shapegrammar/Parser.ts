@@ -165,11 +165,12 @@ class Parser {
       if (shape.symbol == "A" || shape.symbol == "B" || shape.symbol == "C" || 
           shape.symbol == "D" || shape.symbol == "E" || shape.symbol == "F")  {
         let outShapes = this.polyLibrary.subdivideWindows(shape, ["W", "X"]);
+        console.log(shape.symbol);
         this.shapes = this.shapes.concat(outShapes);
         this.windows = this.windows.concat(outShapes);
       }
     }
-
+    
     //Makes one door
     let bottomWindows: Shape[] = [];
     for (let i = 0; i < this.windows.length; i++) {
@@ -231,7 +232,10 @@ class Parser {
         newShapes.push(shape); 
       }
     }
+    console.log("removed windows")
     this.shapes = newShapes;
+    this.windows = [];
+    this.polyLibrary.windows = [];
   }
 
   draw() {

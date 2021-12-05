@@ -171,11 +171,11 @@ function main() {
       shapeGrammar.parse();
     }
     if (window_density.number != prevWindowDensity) {
-      console.log(window_density.number)
+      console.log("Tired " + window_density.number)
       prevWindowDensity = window_density.number;
       shapeGrammar.polyLibrary.windowDensity = window_density.number;
       shapeGrammar.removeWindows();
-      // shapeGrammar.subdivide();
+      shapeGrammar.subdivide();
       shapeGrammar.draw();
     }
     // stats.end();
