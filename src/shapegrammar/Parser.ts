@@ -17,8 +17,9 @@ class Parser {
   colorsMap: Map<string, vec3> = new Map();
   polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh, terrace: Mesh) {
-    this.iterations = 4;
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh, terrace: Mesh,
+    building_color: number[], windows_color: number[], terrace_color: number[], iterations: number, window_density: number) {
+    this.iterations = iterations;
     this.drawableMap.set('A', box1);
     this.dimensionsMap.set('A', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('B', box2);
@@ -39,26 +40,34 @@ class Parser {
     this.dimensionsMap.set('X', vec3.fromValues(1, 1, .2));
     this.drawableMap.set('Y', door);
     this.dimensionsMap.set('Y', vec3.fromValues(1, 1, 1));
-    this.setColorMap()
+    this.setColorMap(building_color, windows_color, terrace_color);
+                    
     this.polyLibrary = new PolygonLibrary(this.dimensionsMap);
+    this.polyLibrary.windowDensity = window_density;
   }
 
-  setColorMap() {
-    this.colorsMap.set('A',vec3.fromValues(1, 1, 1)); 
-    this.colorsMap.set('B',vec3.fromValues(1, 1, 1)); 
-    this.colorsMap.set('C',vec3.fromValues(1, 1, 1)); 
-    this.colorsMap.set('D',vec3.fromValues(1, 1, 1)); 
-    this.colorsMap.set('E',vec3.fromValues(1, 1, 1)); 
-    this.colorsMap.set('F',vec3.fromValues(1, 1, 1)); 
-    this.colorsMap.set('T',vec3.fromValues(197/255, 211/255, 230/255)); 
-    this.colorsMap.set('W',vec3.fromValues(34/255, 130/255, 179/255)); 
-    this.colorsMap.set('X',vec3.fromValues(34/255, 130/255, 179/255)); 
-    this.colorsMap.set('Y',vec3.fromValues(34/255, 130/255, 179/255)); 
+  setColorMap(building_c: number[], windows_c: number[], terrace_c: number[]) {
+    let building_color = vec3.fromValues(building_c[0], building_c[1], building_c[2]);
+    let windows_color = vec3.fromValues(windows_c[0], windows_c[1], windows_c[2]);
+    let terrace_color = vec3.fromValues(terrace_c[0], terrace_c[1], terrace_c[2]);
+    vec3.divide(building_color, building_color, vec3.fromValues(255, 255, 255));
+    vec3.divide(windows_color, windows_color, vec3.fromValues(255, 255, 255));
+    vec3.divide(terrace_color, terrace_color, vec3.fromValues(255, 255, 255));
+    this.colorsMap.set('A',building_color); 
+    this.colorsMap.set('B',building_color); 
+    this.colorsMap.set('C',building_color); 
+    this.colorsMap.set('D',building_color); 
+    this.colorsMap.set('E',building_color); 
+    this.colorsMap.set('F',building_color); 
+    this.colorsMap.set('T',terrace_color); 
+    this.colorsMap.set('W',windows_color); 
+    this.colorsMap.set('X',windows_color); 
+    this.colorsMap.set('Y',windows_color); 
   }
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
   initShapes() {  
-    this.shapes.push(new Shape("A", vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
+    this.shapes.push(new Shape("A", vec3.fromValues(0, -1.5, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
     this.terminalMap.set("D", true);
     this.terminalMap.set("E", true);
     this.terminalMap.set("F", true);
@@ -141,8 +150,6 @@ class Parser {
         }
         // Get the symbol's successors and save them until next iteration
         let rules: GrammarRule[] = this.grammarRules.get(currShape.symbol);
-        console.log(currShape.symbol);
-        console.log(rules);
         let rule: GrammarRule = rules[Math.floor(Math.random() * rules.length)];
         let successors: Shape[] = rule.expand(currShape);
         newShapes = newShapes.concat(successors);
@@ -216,6 +223,17 @@ class Parser {
     mesh.setRotateVBOs(transformCol0, transformCol1, transformCol2, transformCol3);
   }
 
+  removeWindows() {
+    let newShapes: Shape[] = [];
+    for (let i = 0; i < this.shapes.length; i++) {
+      let shape = this.shapes[i];
+      if (shape.symbol != "W" && shape.symbol != "X" && shape.symbol != "Y") {
+        newShapes.push(shape); 
+      }
+    }
+    this.shapes = newShapes;
+  }
+
   draw() {
     this.drawableMap.forEach((value: Mesh, key: string) => {
       let keyShapes: Shape[] = [];
@@ -225,7 +243,6 @@ class Parser {
           keyShapes.push(this.shapes[i]);
         }
       }
-      console.log("num for " + key + ", " + keyShapes.length)
       this.drawMesh(keyShapes, value);
     });
   }
@@ -236,9 +253,6 @@ class Parser {
     this.expand(); 
     this.shapes = this.shapes.concat(this.terminalShapes);
     this.subdivide();
-    for (let i = 0; i <this.shapes.length; i++) {
-      console.log(this.shapes[i].symbol + " " + this.shapes[i].position + " " + this.shapes[i].scale);
-    }
     this.draw();
   }
 }

@@ -32,8 +32,11 @@ let door1: Mesh;
 let terrace: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
-let prevAngle: number = 3.0;
-let prevBranchSparse: number = 0.0;
+let prevBuildingColor: number[] = [255., 255., 255.];
+let prevWindowColor: number[] = [197., 211., 230.];
+let prevTerraceColor: number[] = [197., 211., 230.];
+let prevIterations: number = 4.0;
+let prevWindowDensity: number = .5;
 
 function main() {
   // Initial display for framerate
@@ -46,14 +49,29 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  var color = {
-    color: [255., 255., 5.], // RGB array
+  var building_color = {
+    color: [255., 255., 255.], // RGB array
   };
-  // gui.addColor(color, 'color').name('Lights Color');
-  // var angle = {
-  //   angle: 3.0
-  // };
-  // gui.add(angle, 'angle', 0, 5).step(1).name('Branches Angle');
+  gui.addColor(building_color, 'color').name('Building Color');
+  var windows_color = {
+    color: [34., 130., 179.], // RGB array
+  };
+  gui.addColor(windows_color, 'color').name('Windows Color');
+  var terrace_color = {
+    color: [197., 211., 230.], // RGB array
+  };
+  gui.addColor(terrace_color, 'color').name('Terrace Color');
+  var iterations = {
+    number: 4.0
+  };
+  var iterations = {
+    number: 4.0
+  };
+  gui.add(iterations, 'number', 1, 8).step(1).name('Iterations');
+  var window_density = {
+    number: .5
+  };
+  gui.add(window_density, 'number', 0., 1.).name('Window Density');
   // var sparseness = {
   //   sparseness: 0
   // };
@@ -104,7 +122,8 @@ function main() {
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace);
+  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, 
+                          building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
   shapeGrammar.parse();
 
   const camera = new Camera(vec3.fromValues(0, 0, 10), vec3.fromValues(0, 0, 0));
@@ -133,11 +152,32 @@ function main() {
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    renderer.render(camera, flat, [screenQuad], color.color);
+    renderer.render(camera, flat, [screenQuad], building_color.color);
     renderer.render(camera, instancedShader, [
       box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace
     ],
-    color.color);
+    building_color.color);
+    if (windows_color.color != prevWindowColor || building_color.color != prevBuildingColor || terrace_color.color != prevTerraceColor) {
+      prevWindowColor = windows_color.color;
+      prevBuildingColor =building_color.color;
+      prevTerraceColor = terrace_color.color;
+      shapeGrammar.setColorMap(prevBuildingColor, prevWindowColor, prevTerraceColor);
+      shapeGrammar.draw();
+    }
+    if (iterations.number != prevIterations) {
+      prevIterations = iterations.number;
+      shapeGrammar = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, 
+        building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
+      shapeGrammar.parse();
+    }
+    if (window_density.number != prevWindowDensity) {
+      console.log(window_density.number)
+      prevWindowDensity = window_density.number;
+      shapeGrammar.polyLibrary.windowDensity = window_density.number;
+      shapeGrammar.removeWindows();
+      // shapeGrammar.subdivide();
+      shapeGrammar.draw();
+    }
     // stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

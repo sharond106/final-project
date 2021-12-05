@@ -6,6 +6,7 @@ class PolygonLibrary {
   windowDimensions: vec2;
   shapes: Shape[] = [];
   windows: Shape[] = [];
+  windowDensity: number;
   
   constructor(dimensions: Map<string, vec3>) {
     this.dimensionsMap = dimensions;
@@ -33,17 +34,14 @@ class PolygonLibrary {
         return true;
       }
     }
-    console.log("p=" + pos)
     for (let i = 0; i < this.windows.length; i++) {
       let shape = this.windows[i];
-      console.log("total:" + this.windows.length + " " + shape.symbol + " " + shape.position);
       let relativeP: vec3 = vec3.fromValues(0, 0, 0);
       let dimensions: vec3 = this.getShapeDimensions(shape);
       vec3.subtract(relativeP, p, shape.position);
       relativeP[1] -= dimensions[1] / 2.;
       vec3.divide(dimensions, dimensions, vec3.fromValues(2, 2, 2));
       if (vec3.equals(shape.position, pos) || shape.isInside(relativeP, dimensions)) {
-        console.log("inside")
         return true;
       }
     }
@@ -76,7 +74,8 @@ class PolygonLibrary {
     if (this.intersectsSomething(currShape, pos, bottomRight)) {
       return true;
     }
-    if (Math.random() > .5) {
+    if (Math.random() > (this.windowDensity)) {
+      console.log(this.windowDensity)
       return true;
     }
     return false;
