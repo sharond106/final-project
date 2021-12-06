@@ -17,7 +17,7 @@ class Parser {
   colorsMap: Map<string, vec3> = new Map();
   polyLibrary: PolygonLibrary;
 
-  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh, terrace: Mesh,
+  constructor (box1: Mesh, box2: Mesh, box3: Mesh, box4: Mesh, box5: Mesh, box6: Mesh, window1: Mesh, door: Mesh, window2: Mesh, terrace: Mesh, floor: Mesh,
     building_color: number[], windows_color: number[], terrace_color: number[], iterations: number, window_density: number) {
     this.iterations = iterations;
     this.drawableMap.set('A', box1);
@@ -32,6 +32,8 @@ class Parser {
     this.dimensionsMap.set('E', vec3.fromValues(1.5, 1.5, 1.5));
     this.drawableMap.set('F', box6);
     this.dimensionsMap.set('F', vec3.fromValues(2, 2, 2));
+    this.drawableMap.set('G', floor);
+    this.dimensionsMap.set('G', vec3.fromValues(15, .1, 15));
     this.drawableMap.set('T', terrace);
     this.dimensionsMap.set('T', vec3.fromValues(1, 1, 1));
     this.drawableMap.set('W', window1);
@@ -59,6 +61,7 @@ class Parser {
     this.colorsMap.set('D',building_color); 
     this.colorsMap.set('E',building_color); 
     this.colorsMap.set('F',building_color); 
+    this.colorsMap.set('G',building_color); 
     this.colorsMap.set('T',terrace_color); 
     this.colorsMap.set('W',windows_color); 
     this.colorsMap.set('X',windows_color); 
@@ -68,9 +71,11 @@ class Parser {
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
   initShapes() {  
     this.shapes.push(new Shape("A", vec3.fromValues(0, -1.5, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
+    this.shapes.push(new Shape("G", vec3.fromValues(0, -1.5, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
     this.terminalMap.set("D", true);
     this.terminalMap.set("E", true);
     this.terminalMap.set("F", true);
+    this.terminalMap.set("G", true);
     this.terminalMap.set("T", true);
     this.terminalMap.set("W", true);
   }
@@ -122,13 +127,17 @@ class Parser {
     this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5], false));
     this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
     this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], false));
+    this.initEntry("B", this.initRule(["E", "A", "A"], [0, .5, .5], [0, 0, 0], [0, 1., -1.], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], true));
     this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+    this.initEntry("B", this.initRule(["B", "D"], [0, 0], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1.5], false));
     this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1], false));
     this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1], false));
     this.initEntry("C", this.initRule(["F", "T", "T", "T", "T", "T", "T"], 
                                       [0, 1.5, 2.5, 3.5, 1.5, 2.5, 3.5], [0, 0, 0, 0, 0, 0, 0], [0, .5, .5 ,.5, -.5, -.5, -.5], 
                                       [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 
                                       [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], true));
+    this.initEntry("C", this.initRule(["F", "B", "A"], [0, .75, .5], [0, 0, 0], [0, 1.5, -1.], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], true));
+    this.initEntry("C", this.initRule(["C", "E"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
     
   }
 
@@ -180,6 +189,7 @@ class Parser {
       }
     }
     if (bottomWindows.length != 0) {
+      console.log("door");
       bottomWindows[Math.floor(Math.random() * bottomWindows.length)].symbol = "Y";
     }
   }

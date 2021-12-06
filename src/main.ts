@@ -30,6 +30,7 @@ let window1: Mesh;
 let window2: Mesh;
 let door1: Mesh;
 let terrace: Mesh;
+let floor: Mesh;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
 let prevBuildingColor: number[] = [255., 255., 255.];
@@ -117,12 +118,15 @@ function main() {
   let obj9: string = readTextFile('./Meshes/terrace.obj');
   terrace = new Mesh(obj9, vec3.fromValues(0, 0, 0));
   terrace.create();
+  let obj10: string = readTextFile('./Meshes/floor.obj');
+  floor = new Mesh(obj10, vec3.fromValues(0, 0, 0));
+  floor.create();
 
 
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
-  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, 
+  let shapeGrammar: Parser = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, floor,
                           building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
   shapeGrammar.parse();
 
@@ -154,7 +158,7 @@ function main() {
     renderer.clear();
     renderer.render(camera, flat, [screenQuad], building_color.color);
     renderer.render(camera, instancedShader, [
-      box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace
+      box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, floor
     ],
     building_color.color);
     if (windows_color.color != prevWindowColor || building_color.color != prevBuildingColor || terrace_color.color != prevTerraceColor) {
@@ -166,7 +170,7 @@ function main() {
     }
     if (iterations.number != prevIterations) {
       prevIterations = iterations.number;
-      shapeGrammar = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, 
+      shapeGrammar = new Parser(box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, floor,
         building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
       shapeGrammar.parse();
     }
