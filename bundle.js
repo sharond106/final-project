@@ -6197,6 +6197,7 @@ let window1;
 let window2;
 let door1;
 let terrace;
+let floor;
 let screenQuad;
 let time = 0.0;
 let prevBuildingColor = [255., 255., 255.];
@@ -6280,9 +6281,12 @@ function main() {
     let obj9 = readTextFile('./Meshes/terrace.obj');
     terrace = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj9, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     terrace.create();
+    let obj10 = readTextFile('./Meshes/floor.obj');
+    floor = new __WEBPACK_IMPORTED_MODULE_7__geometry_Mesh__["a" /* default */](obj10, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
+    floor.create();
     screenQuad = new __WEBPACK_IMPORTED_MODULE_2__geometry_ScreenQuad__["a" /* default */]();
     screenQuad.create();
-    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
+    let shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, floor, building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
     shapeGrammar.parse();
     const camera = new __WEBPACK_IMPORTED_MODULE_4__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_3__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
@@ -6308,7 +6312,7 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad], building_color.color);
         renderer.render(camera, instancedShader, [
-            box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace
+            box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, floor
         ], building_color.color);
         if (windows_color.color != prevWindowColor || building_color.color != prevBuildingColor || terrace_color.color != prevTerraceColor) {
             prevWindowColor = windows_color.color;
@@ -6319,7 +6323,7 @@ function main() {
         }
         if (iterations.number != prevIterations) {
             prevIterations = iterations.number;
-            shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
+            shapeGrammar = new __WEBPACK_IMPORTED_MODULE_8__shapegrammar_Parser__["a" /* default */](box1, box2, box3, box4, box5, box6, window1, door1, window2, terrace, floor, building_color.color, windows_color.color, terrace_color.color, iterations.number, window_density.number);
             shapeGrammar.parse();
         }
         if (window_density.number != prevWindowDensity) {
@@ -16882,7 +16886,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 class Parser {
-    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2, terrace, building_color, windows_color, terrace_color, iterations, window_density) {
+    constructor(box1, box2, box3, box4, box5, box6, window1, door, window2, terrace, floor, building_color, windows_color, terrace_color, iterations, window_density) {
         this.shapes = [];
         this.terminalShapes = [];
         this.windows = [];
@@ -16904,6 +16908,8 @@ class Parser {
         this.dimensionsMap.set('E', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1.5, 1.5, 1.5));
         this.drawableMap.set('F', box6);
         this.dimensionsMap.set('F', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(2, 2, 2));
+        this.drawableMap.set('G', floor);
+        this.dimensionsMap.set('G', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(15, .1, 15));
         this.drawableMap.set('T', terrace);
         this.dimensionsMap.set('T', __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1));
         this.drawableMap.set('W', window1);
@@ -16929,6 +16935,7 @@ class Parser {
         this.colorsMap.set('D', building_color);
         this.colorsMap.set('E', building_color);
         this.colorsMap.set('F', building_color);
+        this.colorsMap.set('G', building_color);
         this.colorsMap.set('T', terrace_color);
         this.colorsMap.set('W', windows_color);
         this.colorsMap.set('X', windows_color);
@@ -16937,9 +16944,11 @@ class Parser {
     // Initialize this.shapes, this.terminalShapes, this.terminalMap
     initShapes() {
         this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("A", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, -1.5, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
+        this.shapes.push(new __WEBPACK_IMPORTED_MODULE_1__Shape__["a" /* default */]("G", __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, -1.5, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 0, 1), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 0, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_3_gl_matrix__["e" /* vec3 */].fromValues(1, 1, 1)));
         this.terminalMap.set("D", true);
         this.terminalMap.set("E", true);
         this.terminalMap.set("F", true);
+        this.terminalMap.set("G", true);
         this.terminalMap.set("T", true);
         this.terminalMap.set("W", true);
     }
@@ -16981,10 +16990,14 @@ class Parser {
         this.initEntry("A", this.initRule(["D", "C"], [-1, -2], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [2, 1], [1, 1], [1, 1.5], false));
         this.initEntry("B", this.initRule(["B", "C"], [0, 0], [0, 0], [0, -1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
         this.initEntry("B", this.initRule(["E", "F", "C"], [0, 0, 1.5], [0, 0, 0], [0, 1.5, 1.5], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], false));
+        this.initEntry("B", this.initRule(["E", "A", "A"], [0, .5, .5], [0, 0, 0], [0, 1., -1.], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], true));
         this.initEntry("B", this.initRule(["B", "C"], [0, -1.5], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
+        this.initEntry("B", this.initRule(["B", "D"], [0, 0], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1.5], false));
         this.initEntry("C", this.initRule(["C", "D"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1.5], [1, 1], [1, 1], false));
         this.initEntry("C", this.initRule(["F", "B"], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [1, 2], [1, 1], [1, 1], false));
         this.initEntry("C", this.initRule(["F", "T", "T", "T", "T", "T", "T"], [0, 1.5, 2.5, 3.5, 1.5, 2.5, 3.5], [0, 0, 0, 0, 0, 0, 0], [0, .5, .5, .5, -.5, -.5, -.5], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], true));
+        this.initEntry("C", this.initRule(["F", "B", "A"], [0, .75, .5], [0, 0, 0], [0, 1.5, -1.], [0, 0, 0], [0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], true));
+        this.initEntry("C", this.initRule(["C", "E"], [0, 0], [0, 1.5], [0, 0], [0, 0], [0, 0], [0, 0], [1, 1], [1, 1], [1, 1], false));
     }
     // Expands this.shapes and this.terminalShapes for this.iterations
     expand() {
@@ -17031,6 +17044,7 @@ class Parser {
             }
         }
         if (bottomWindows.length != 0) {
+            console.log("door");
             bottomWindows[Math.floor(Math.random() * bottomWindows.length)].symbol = "Y";
         }
     }
