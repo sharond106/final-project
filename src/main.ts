@@ -87,6 +87,7 @@ function main() {
   // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
+  console.log("begin");
 
   let obj0: string = readTextFile('roundbox1.obj');
   box1 = new Mesh(obj0, vec3.fromValues(0, 0, 0));
