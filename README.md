@@ -91,3 +91,17 @@ Example generations 2
 ![](images/house5.PNG) 
 
 ![](images/house6.PNG)
+
+# Final Renders
+Implemented
+- Fixed some intersection testing bugs
+- Improved grammar rules to add more height contrast 
+- Added extra window mesh
+- Gamma lighting and contrast
+- Added terraces 
+- Changed background 
+- GUI can change different colors, the number of shape grammar iterations, and the probabilty that windows are placed 
+
+![](ex1.PNG)
+
+![](ex2.PNG)
