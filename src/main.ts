@@ -88,37 +88,37 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-  let obj0: string = readTextFile('roundbox1.obj');
+  let obj0: string = readTextFile('/Meshes/roundbox1.obj');
   box1 = new Mesh(obj0, vec3.fromValues(0, 0, 0));
   box1.create();
-  let obj1: string = readTextFile('roundbox2.obj');
+  let obj1: string = readTextFile('/Meshes/roundbox2.obj');
   box2 = new Mesh(obj1, vec3.fromValues(0, 0, 0));
   box2.create();
-  let obj2: string = readTextFile('roundbox3.obj');
+  let obj2: string = readTextFile('/Meshes/roundbox3.obj');
   box3 = new Mesh(obj2, vec3.fromValues(0, 0, 0));
   box3.create();
-  let obj3: string = readTextFile('roundbox1.obj');
+  let obj3: string = readTextFile('/Meshes/roundbox1.obj');
   box4 = new Mesh(obj3, vec3.fromValues(0, 0, 0));
   box4.create();
-  let obj4: string = readTextFile('window1.obj');
+  let obj4: string = readTextFile('/Meshes/window1.obj');
   window1 = new Mesh(obj4, vec3.fromValues(0, 0, 0));
   window1.create();
-  let obj5: string = readTextFile('door.obj');
+  let obj5: string = readTextFile('/Meshes/door.obj');
   door1 = new Mesh(obj5, vec3.fromValues(0, 0, 0));
   door1.create();
-  let obj6: string = readTextFile('roundbox2.obj');
+  let obj6: string = readTextFile('/Meshes/roundbox2.obj');
   box5 = new Mesh(obj6, vec3.fromValues(0, 0, 0));
   box5.create();
-  let obj7: string = readTextFile('roundbox3.obj');
+  let obj7: string = readTextFile('/Meshes/roundbox3.obj');
   box6 = new Mesh(obj7, vec3.fromValues(0, 0, 0));
   box6.create();
-  let obj8: string = readTextFile('window2.obj');
+  let obj8: string = readTextFile('/Meshes/window2.obj');
   window2 = new Mesh(obj8, vec3.fromValues(0, 0, 0));
   window2.create();
-  let obj9: string = readTextFile('terrace.obj');
+  let obj9: string = readTextFile('/Meshes/terrace.obj');
   terrace = new Mesh(obj9, vec3.fromValues(0, 0, 0));
   terrace.create();
-  let obj10: string = readTextFile('floor.obj');
+  let obj10: string = readTextFile('/Meshes/floor.obj');
   floor = new Mesh(obj10, vec3.fromValues(0, 0, 0));
   floor.create();
 
