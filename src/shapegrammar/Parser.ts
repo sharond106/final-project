@@ -61,7 +61,7 @@ class Parser {
     this.colorsMap.set('D',building_color); 
     this.colorsMap.set('E',building_color); 
     this.colorsMap.set('F',building_color); 
-    this.colorsMap.set('G',building_color); 
+    this.colorsMap.set('G',vec3.fromValues(230./255., 228./255., 218./255.)); 
     this.colorsMap.set('T',terrace_color); 
     this.colorsMap.set('W',windows_color); 
     this.colorsMap.set('X',windows_color); 
@@ -70,8 +70,8 @@ class Parser {
 
   // Initialize this.shapes, this.terminalShapes, this.terminalMap
   initShapes() {  
-    this.shapes.push(new Shape("A", vec3.fromValues(0, -1.5, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
-    this.shapes.push(new Shape("G", vec3.fromValues(0, -1.5, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
+    this.shapes.push(new Shape("A", vec3.fromValues(0, -2, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(1, 1, 1)));
+    this.shapes.push(new Shape("G", vec3.fromValues(0, -2, 0), vec3.fromValues(0, 0, 1), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0), vec3.fromValues(3, 1, 3)));
     this.terminalMap.set("D", true);
     this.terminalMap.set("E", true);
     this.terminalMap.set("F", true);
